@@ -16,7 +16,7 @@ function Profile({ user, refreshUser }) {
     // console.log("UsER ID",userID);
     try {
       const { data } = await axios.get(
-        `http://localhost:3000/api/warehouse/info`,
+        `${import.meta.env.VITE_API_URL}/api/warehouse/info`,
         {
           params: { userID: user?._id },
           withCredentials: true,
@@ -46,7 +46,7 @@ function Profile({ user, refreshUser }) {
   const [warehouses, setWarehouses] = useState([
     {
       name: "",
-      capacity:  "",
+      capacity: "",
 
       location: {
         line1: "",
@@ -110,10 +110,13 @@ function Profile({ user, refreshUser }) {
   const removeWarehouse = async (index) => {
     const updatedWarehouses = warehouses.filter((_, i) => i !== index);
     setWarehouses(updatedWarehouses);
-    await axios.delete(`http://localhost:3000/api/warehouse/info-delete`, {
-      params: { userID: user._id, warehouseID: warehouses[index]._id },
-      withCredentials: true,
-    });
+    await axios.delete(
+      `${import.meta.env.VITE_API_URL}/api/warehouse/info-delete`,
+      {
+        params: { userID: user._id, warehouseID: warehouses[index]._id },
+        withCredentials: true,
+      }
+    );
     alert("Warehouse deleted successfully!");
     fetchWarehouseDetail();
   };
@@ -130,19 +133,23 @@ function Profile({ user, refreshUser }) {
     try {
       if (user?.isNewUser) {
         await axios.post(
-          "http://localhost:3000/api/warehouse/info-add",
+          `${import.meta.env.VITE_API_URL}/api/warehouse/info-add`,
           warehouseData
         );
       } else {
         await axios.put(
-          "http://localhost:3000/api/warehouse/info-update",
+          `${import.meta.env.VITE_API_URL}/api/warehouse/info-update`,
           warehouseData
         );
       }
 
-      await axios.put("http://localhost:3000/api/update", submitData, {
-        withCredentials: true,
-      });
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/user/update`,
+        submitData,
+        {
+          withCredentials: true,
+        }
+      );
       // console.log(submitData);
       alert("Profile updated successfully!");
       await refreshUser();

@@ -6,22 +6,25 @@ import Bg from "../assets/loginBg.jpg";
 
 export function LoginForm() {
   const [error, setError] = useState(null);
-  const [isSignUp, setIsSignUp] = useState(false); 
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const googleAuth = () => {
-    window.open("http://localhost:3000/auth/google", "_self");
+    window.open(`${import.meta.env.VITE_API_URL}/auth/google`, "_self");
   };
 
   return (
     <div
       className="fixed inset-0 flex justify-center items-center bg-cover bg-center bg-red-900 opacity-100"
-      style={{ backgroundImage: `url(${Bg})`  }}
+      style={{ backgroundImage: `url(${Bg})` }}
     >
       <div className="flex w-full max-w-4xl bg-white/20 backdrop-blur-md shadow-2xl rounded-3xl border border-white/30 overflow-hidden">
         <div className="hidden md:flex w-1/2 ">
-          <img src={LoginImg} alt="Login Visual" className="w-full h-full object-cover" />
+          <img
+            src={LoginImg}
+            alt="Login Visual"
+            className="w-full h-full object-cover"
+          />
         </div>
-
 
         <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
           <h2 className="text-3xl font-extrabold text-left mb-6 text-slate tracking-wide">
@@ -41,7 +44,11 @@ export function LoginForm() {
           </button>
 
           <div className="mt-6 text-left text-sm text-black">
-            <span>{isSignUp ? "Already have an account? " : "Don't have an account? "}</span>
+            <span>
+              {isSignUp
+                ? "Already have an account? "
+                : "Don't have an account? "}
+            </span>
             <button
               onClick={() => setIsSignUp(!isSignUp)}
               className="text-blue-500 font-semibold underline hover:text-gray-200 transition"

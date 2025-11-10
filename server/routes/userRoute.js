@@ -3,7 +3,7 @@ import { User } from "../models/user.js";
 
 const router = express.Router();
 
-router.get("/user", async (req, res) => {
+router.get("/", async (req, res) => {
   if (!req.isAuthenticated()) {
     return res.status(401).json({ error: "Not authenticated" });
   }

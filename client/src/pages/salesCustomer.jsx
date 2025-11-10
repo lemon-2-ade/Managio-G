@@ -23,14 +23,14 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  MoreHorizontal, 
-  FileEdit, 
-  ChevronLeft, 
-  ChevronRight, 
-  Filter, 
-  Users
+import {
+  Search,
+  MoreHorizontal,
+  FileEdit,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
@@ -48,9 +48,12 @@ const CustomerManagement = ({ user }) => {
     const fetchCustomers = async () => {
       const userID = user._id;
       try {
-        const response = await axios.get("http://localhost:3000/api/customer/all-customers", {
-          params: { userID: userID },
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/customer/all-customers`,
+          {
+            params: { userID: userID },
+          }
+        );
         setCustomers(response.data);
         toast.success("Customer data loaded successfully!");
       } catch (error) {
@@ -71,7 +74,7 @@ const CustomerManagement = ({ user }) => {
   // const handleDeleteCustomer = async (customerId) => {
   //   try {
   //     const deletedCustomer = customers.find((customer) => customer._id === customerId);
-  //     await axios.delete(`http://localhost:3000/api/customer/delete-customer`, {
+  //     await axios.delete(`{import.meta.env.VITE_API_URL}/api/customer/delete-customer`, {
   //       params: { userID: user._id, customerID: customerId },
   //     });
   //     setCustomers((prevCustomers) => prevCustomers.filter((customer) => customer._id !== customerId));
@@ -89,7 +92,9 @@ const CustomerManagement = ({ user }) => {
 
     switch (filterField) {
       case "customerId":
-        return `CUST-${customer._id.toString().padStart(4, '0')}`.toLowerCase().includes(searchTerm.toLowerCase());
+        return `CUST-${customer._id.toString().padStart(4, "0")}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
       case "gstin":
         return customer.gstIN.toLowerCase().includes(searchTerm.toLowerCase());
       case "contactNo":
@@ -97,12 +102,16 @@ const CustomerManagement = ({ user }) => {
       case "email":
         return customer.email.toLowerCase().includes(searchTerm.toLowerCase());
       case "address":
-        return customer.address.toLowerCase().includes(searchTerm.toLowerCase());
+        return customer.address
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
       case "all":
       default:
         return (
           customer.gstIN.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          `CUST-${customer._id.toString().padStart(4, '0')}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          `CUST-${customer._id.toString().padStart(4, "0")}`
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
           customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
           customer.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
           customer.contactNo.includes(searchTerm)
@@ -112,7 +121,10 @@ const CustomerManagement = ({ user }) => {
 
   const indexOfLastCustomer = currentPage * entriesPerPage;
   const indexOfFirstCustomer = indexOfLastCustomer - entriesPerPage;
-  const currentCustomers = filteredCustomers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  const currentCustomers = filteredCustomers.slice(
+    indexOfFirstCustomer,
+    indexOfLastCustomer
+  );
   const totalPages = Math.ceil(filteredCustomers.length / entriesPerPage);
 
   const handleFilterChange = (value) => {
@@ -132,7 +144,7 @@ const CustomerManagement = ({ user }) => {
         onClose={() => setIsAddModalOpen(false)}
         onAddCustomer={handleAddCustomer}
       /> */}
-      
+
       {/* Page Header */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between">
@@ -141,8 +153,12 @@ const CustomerManagement = ({ user }) => {
               <Users className="w-7 h-7 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">Customer Management</h1>
-              <p className="ml-1 mt-1 text-gray-500 text-sm">Manage and track your customer information</p>
+              <h1 className="text-3xl font-bold text-gray-800">
+                Customer Management
+              </h1>
+              <p className="ml-1 mt-1 text-gray-500 text-sm">
+                Manage and track your customer information
+              </p>
             </div>
           </div>
           {/* <Button 
@@ -167,7 +183,7 @@ const CustomerManagement = ({ user }) => {
                 onChange={handleSearchChange}
               />
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Filter className="h-5 w-5 text-gray-500" />
               <Select defaultValue="all" onValueChange={handleFilterChange}>
@@ -193,8 +209,8 @@ const CustomerManagement = ({ user }) => {
         <div className=" pr-2 pl-1 bg-gray-50 border-b p-1  flex justify-between items-center">
           <div className="flex items-center space-x-2 ">
             <span className="text-sm text-gray-600">Show</span>
-            <Select 
-              defaultValue="10" 
+            <Select
+              defaultValue="10"
               onValueChange={(value) => setEntriesPerPage(Number(value))}
             >
               <SelectTrigger className="w-20">
@@ -209,16 +225,20 @@ const CustomerManagement = ({ user }) => {
             </Select>
             <span className="text-sm text-gray-600 ">entries</span>
           </div>
-          
+
           {filterField !== "all" && (
             <div className="px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-xs flex items-center">
-              Filtering by: {
-                filterField === "customerId" ? "Customer ID" : 
-                filterField === "gstin" ? "GSTIN" : 
-                filterField === "contactNo" ? "Contact No." : 
-                filterField === "email" ? "Email" : "Address"
-              }
-              <button 
+              Filtering by:{" "}
+              {filterField === "customerId"
+                ? "Customer ID"
+                : filterField === "gstin"
+                  ? "GSTIN"
+                  : filterField === "contactNo"
+                    ? "Contact No."
+                    : filterField === "email"
+                      ? "Email"
+                      : "Address"}
+              <button
                 className="ml-2 text-blue-600 hover:text-blue-800"
                 onClick={() => setFilterField("all")}
               >
@@ -226,7 +246,7 @@ const CustomerManagement = ({ user }) => {
               </button>
             </div>
           )}
-          
+
           <div className="text-sm text-gray-500 italic">
             Last updated: {new Date().toLocaleString()}
           </div>
@@ -247,26 +267,43 @@ const CustomerManagement = ({ user }) => {
               currentCustomers.map((customer) => (
                 <TableRow key={customer._id} className="hover:bg-gray-50">
                   <TableCell className="font-medium">
-                    <div className={filterField === "customerId" ? "bg-yellow-50 px-1 rounded" : ""}>
+                    <div
+                      className={
+                        filterField === "customerId"
+                          ? "bg-yellow-50 px-1 rounded"
+                          : ""
+                      }
+                    >
                       {customer.gstIN}
                     </div>
-                    <div className={`text-xs text-gray-500 mt-1 ${filterField === "gstin" ? "bg-yellow-50 px-1 rounded" : ""}`}>
+                    <div
+                      className={`text-xs text-gray-500 mt-1 ${filterField === "gstin" ? "bg-yellow-50 px-1 rounded" : ""}`}
+                    >
                       {customer.name}
                     </div>
                   </TableCell>
-                  <TableCell className={`${filterField === "contactNo" ? "bg-yellow-50 px-1 rounded" : ""}`}>
+                  <TableCell
+                    className={`${filterField === "contactNo" ? "bg-yellow-50 px-1 rounded" : ""}`}
+                  >
                     {customer.contactNo}
                   </TableCell>
-                  <TableCell className={`text-blue-600 hover:text-blue-800 ${filterField === "email" ? "bg-yellow-50 px-1 rounded" : ""}`}>
+                  <TableCell
+                    className={`text-blue-600 hover:text-blue-800 ${filterField === "email" ? "bg-yellow-50 px-1 rounded" : ""}`}
+                  >
                     <a href={`mailto:${customer.email}`}>{customer.email}</a>
                   </TableCell>
-                  <TableCell className={`max-w-xs truncate ${filterField === "address" ? "bg-yellow-50 px-1 rounded" : ""}`}>
+                  <TableCell
+                    className={`max-w-xs truncate ${filterField === "address" ? "bg-yellow-50 px-1 rounded" : ""}`}
+                  >
                     {customer.address}
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 rounded-full hover:bg-gray-100">
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0 rounded-full hover:bg-gray-100"
+                        >
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
@@ -299,9 +336,11 @@ const CustomerManagement = ({ user }) => {
                 <TableCell colSpan={5} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-2">
                     <Search className="h-8 w-8 text-gray-300" />
-                    <p className="text-gray-500">No customers found matching your search</p>
+                    <p className="text-gray-500">
+                      No customers found matching your search
+                    </p>
                     {filterField !== "all" && (
-                      <Button 
+                      <Button
                         variant="link"
                         className="text-blue-600"
                         onClick={() => setFilterField("all")}
@@ -316,39 +355,44 @@ const CustomerManagement = ({ user }) => {
           </TableBody>
         </Table>
       </div>
-      
+
       {/* Pagination */}
       <div className="flex items-center justify-between mt-6 text-sm">
         <div className="text-gray-600">
-          Showing {filteredCustomers.length > 0 ? indexOfFirstCustomer + 1 : 0} to {Math.min(indexOfLastCustomer, filteredCustomers.length)} of {filteredCustomers.length} customer{filteredCustomers.length !== 1 ? 's' : ''}
+          Showing {filteredCustomers.length > 0 ? indexOfFirstCustomer + 1 : 0}{" "}
+          to {Math.min(indexOfLastCustomer, filteredCustomers.length)} of{" "}
+          {filteredCustomers.length} customer
+          {filteredCustomers.length !== 1 ? "s" : ""}
         </div>
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
           >
             <ChevronLeft className="h-4 w-4 mr-1" /> Previous
           </Button>
-          
+
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
             <Button
               key={page}
               variant="outline"
               size="sm"
-              className={`w-8 h-8 p-0 ${currentPage === page ? 'bg-blue-50 text-blue-700 border-blue-300' : ''}`}
+              className={`w-8 h-8 p-0 ${currentPage === page ? "bg-blue-50 text-blue-700 border-blue-300" : ""}`}
               onClick={() => setCurrentPage(page)}
             >
               {page}
             </Button>
           ))}
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             size="sm"
             disabled={currentPage === totalPages || totalPages === 0}
-            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+            }
           >
             Next <ChevronRight className="h-4 w-4 ml-1" />
           </Button>

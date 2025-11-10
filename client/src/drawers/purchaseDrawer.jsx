@@ -13,9 +13,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import axios from "axios";
 
-export default function PurchaseDrawer({ user ,fetchUser}) {
+export default function PurchaseDrawer({ user, fetchUser }) {
   const [open, setOpen] = useState(false);
-  const [warehouses, setWarehouses] = useState([]); 
+  const [warehouses, setWarehouses] = useState([]);
   const [purchaseOrder, setPurchaseOrder] = useState({
     name: "",
     contactNo: "",
@@ -100,9 +100,9 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
     if (!itemCode) return;
     try {
       const response = await fetch(
-        `http://localhost:3000/hsn/hsnAdd/${itemCode}`
+        `${import.meta.env.VITE_API_URL}/hsn/hsnAdd/${itemCode}`
       );
-      // const rponce = await fetch(`http://localhost:3000/newCustomer/customer-list`,{name:name} );
+      // const rponce = await fetch(`{import.meta.env.VITE_API_URL}/newCustomer/customer-list`,{name:name} );
       // const customerData = await response.json(),
 
       if (!response.ok) throw new Error("Item not found");
@@ -153,7 +153,7 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
     try {
       const purchaseDetail = {
         userID: user._id,
-        supplierDetails : {
+        supplierDetails: {
           name: purchaseOrder.name,
           contactNo: purchaseOrder.contactNo,
           email: purchaseOrder.email,
@@ -163,13 +163,13 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
         // date: purchaseOrder.purchaseDate,
         items: purchaseOrder.items,
         warehouseID: purchaseOrder.warehouseID,
-      }
+      };
       // console.log("Purchase Detail:", purchaseDetail);
       const response = await axios.post(
-        `http://localhost:3000/api/purchase/add-purchase`,
+        `${import.meta.env.VITE_API_URL}/api/purchase/add-purchase`,
         { ...purchaseDetail }
       );
-      
+
       // console.log("Purchase Order Data:", purchaseOrder);
       alert("Purchase Order Submitted");
       setOpen(false); // Close the drawer
@@ -194,7 +194,7 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
             gstPer: 0,
           },
         ],
-        warehouseID:  "",
+        warehouseID: "",
         sgstAmt: 0,
         cgstAmt: 0,
         igstAmt: 0,
@@ -206,19 +206,20 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
     }
   };
 
-
   useEffect(() => {
     const fetchWarehouseDetails = async () => {
       if (!user || !user._id) return;
-      
+
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/warehouse/info`,
-          { params: { userID: user._id } }
+          `${import.meta.env.VITE_API_URL}/api/warehouse/info`,
+          {
+            params: { userID: user._id },
+          }
         );
         const data = response.data.warehouseDetails;
         // console.log("Warehouse Details:", data);
-        setWarehouses(data); 
+        setWarehouses(data);
       } catch (error) {
         console.error("Error fetching warehouse details:", error);
       }
@@ -260,20 +261,19 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
           <div className="space-y-6">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                 <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Invoice No.
-                </label>
-                <input
-                  type="text"
-                  name="invoiceNo"
-                  value={purchaseOrder.invoiceNo}
-                  onChange={handleChange}
-                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  placeholder="Enter invoice number"
-                />
-              </div>
-                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Invoice No.
+                  </label>
+                  <input
+                    type="text"
+                    name="invoiceNo"
+                    value={purchaseOrder.invoiceNo}
+                    onChange={handleChange}
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    placeholder="Enter invoice number"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">
@@ -329,7 +329,6 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
                 />
               </div>
 
-             
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">
                   WarehouseID
@@ -341,11 +340,13 @@ export default function PurchaseDrawer({ user ,fetchUser}) {
                   className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 >
                   <option value="">Select a warehouse</option>
-                  {warehouses && warehouses.length > 0 && warehouses.map((warehouse) => (
-                    <option key={warehouse._id} value={warehouse._id}>
-                      {warehouse.name}
-                    </option>
-                  ))}
+                  {warehouses &&
+                    warehouses.length > 0 &&
+                    warehouses.map((warehouse) => (
+                      <option key={warehouse._id} value={warehouse._id}>
+                        {warehouse.name}
+                      </option>
+                    ))}
                 </select>
               </div>
               <div className="space-y-2">

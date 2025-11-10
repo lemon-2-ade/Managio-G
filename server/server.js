@@ -17,7 +17,7 @@ import warehouseRoutes from "./routes/warehouseRoute.js";
 import newCustomerRoute from "./routes/newCustomerRoute.js";
 import supplierRoutes from "./routes/supplierRoutes.js"
 
-dotenv.config({ path: "../.env" });
+dotenv.config();
 
 const app = express();
 // MongoDB Implementation
@@ -27,7 +27,7 @@ const MongoUri = process.env.DATABASE_URI;
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow only the frontend to access this server
+    origin: [process.env.CORS_ORIGIN, "http://localhost:5173"], // Allow only the frontend to access this server
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
   }),
@@ -63,9 +63,13 @@ mongoose
 //Routes for Google OAuth
 app.use(
   session({
-    secret: "secret", // Use a secure secret
+    secret: process.env.SESSION_SECRET, // Use a secure secret
     resave: false,
     saveUninitialized: true,
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      secure: false, // Set to true if using HTTPS
+    }
   }),
 );
 app.use(passport.initialize());
@@ -73,8 +77,8 @@ app.use(passport.session());
 
 
 app.use("/hsn", hsnRoutes)
-app.use("/auth",authRoutes)
-app.use("/api", userRoutes)
+app.use("/auth", authRoutes)
+app.use("/api/user", userRoutes)
 app.use("/api/purchase", purchaseRoutes)
 app.use("/api/sales", salesRoutes)
 app.use("/api/supplier", supplierRoutes);
@@ -83,11 +87,9 @@ app.use("/api/warehouse", warehouseRoutes)
 app.use("/api/items", itemRoutes);
 app.use("/api/customer", customerRoutes);
 
-
-
 //___________________________________________________________________________________________________________________________________________________
-// const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 
-app.listen(3000, () => {
-  console.log(`Server running on port ${3000}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 }); 

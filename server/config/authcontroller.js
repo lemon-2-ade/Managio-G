@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { User } from "../models/user.js";
 import { Warehouse } from "../models/warehouse.js";
 
-dotenv.config({ path: "../.env" });
+dotenv.config();
 
 passport.use(
   new GoogleStrategy(
@@ -66,7 +66,7 @@ passport.use(
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user._id);
 });
 
 passport.deserializeUser(async (id, done) => {

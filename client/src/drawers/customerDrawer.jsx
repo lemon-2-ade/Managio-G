@@ -49,29 +49,27 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
       const userID = user._id;
       console.log(userID);
 
-
-        const newCustomerPersonal = await axios.post(
-        "http://localhost:3000/newCustomer/customer/personal", 
-        { userID, ...submitData }, 
+      const newCustomerPersonal = await axios.post(
+        `${import.meta.env.VITE_API_URL}/newCustomer/customer/personal`,
+        { userID, ...submitData },
         { withCredentials: true }
       );
       console.log(newCustomerPersonal.data);
-      alert("Customer Already exists")
-      
+      alert("Customer Already exists");
 
       const newCustomer = await axios.post(
-        "http://localhost:3000/newCustomer/customer-add",
+        `${import.meta.env.VITE_API_URL}/newCustomer/customer-add`,
         submitData,
         { withCredentials: true }
       );
-      console.log(newCustomer.data); 
-      toast.success("Customer added successfully!"); 
+      console.log(newCustomer.data);
+      toast.success("Customer added successfully!");
       resetForm();
       onClose();
     } catch (error) {
       console.error("Error adding customer:", error);
       // setErrors({ form: "Failed to add customer. Please try again." });
-      alert("Failed to add customer. Please try again.")
+      alert("Failed to add customer. Please try again.");
     }
   };
 
@@ -102,12 +100,10 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          
-            <div className="bg-red-50 p-3 rounded-md flex items-start gap-2 text-red-700 text-sm">
-              {/* <toast className="h-5 w-5 text-red-500 mt-0.5" /> */}
-              <p>{errors.form}</p>
-            </div>
-
+          <div className="bg-red-50 p-3 rounded-md flex items-start gap-2 text-red-700 text-sm">
+            {/* <toast className="h-5 w-5 text-red-500 mt-0.5" /> */}
+            <p>{errors.form}</p>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="customerNo" className="text-gray-700">
@@ -123,9 +119,8 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
                 errors.customerNo ? "border-red-300 focus:border-red-500" : ""
               }
             />
-       
-              <p className="text-sm text-red-500">{errors.customerNo}</p>
-   
+
+            <p className="text-sm text-red-500">{errors.customerNo}</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="customerNo" className="text-gray-700">
@@ -141,9 +136,8 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
                 errors.customerName ? "border-red-300 focus:border-red-500" : ""
               }
             />
-           
-              <p className="text-sm text-red-500">{errors.customerNo}</p>
-   
+
+            <p className="text-sm text-red-500">{errors.customerNo}</p>
           </div>
 
           <div className="space-y-2">
@@ -160,9 +154,8 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
                 errors.contactNo ? "border-red-300 focus:border-red-500" : ""
               }
             />
-           
-              <p className="text-sm text-red-500">{errors.contactNo}</p>
-      
+
+            <p className="text-sm text-red-500">{errors.contactNo}</p>
           </div>
 
           <div className="space-y-2">
@@ -200,9 +193,8 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
                 errors.address ? "border-red-300 focus:border-red-500" : ""
               }
             />
-       
-              <p className="text-sm text-red-500">{errors.address}</p>
-          
+
+            <p className="text-sm text-red-500">{errors.address}</p>
           </div>
 
           <DialogFooter className="mt-6">

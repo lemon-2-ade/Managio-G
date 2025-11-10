@@ -31,8 +31,10 @@ export const SalesOrderDashboard = ({ user }) => {
         const userID = user._id;
         // console.log("User ID:", userID);
         const res = await axios.get(
-          "http://localhost:3000/api/sales/all-sales",
-          { params: { userID } }
+          `${import.meta.env.VITE_API_URL}/api/sales/all-sales`,
+          {
+            params: { userID },
+          }
         );
         if (res.data && res.data.salesDetails) {
           setSales(res.data.salesDetails);
@@ -52,20 +54,26 @@ export const SalesOrderDashboard = ({ user }) => {
     }
   }, [user]);
 
-  const filteredSales = Array.isArray(sales) ? sales.filter((sale) => {
-    const searchLower = search.toLowerCase();
+  const filteredSales = Array.isArray(sales)
+    ? sales.filter((sale) => {
+        const searchLower = search.toLowerCase();
 
-    switch (true) {
-      case filterByName:
-        return sale.customerDetails?.name?.toLowerCase().includes(searchLower);
-      case filterByGst:
-        return sale.customerDetails?.gstIN?.toLowerCase().includes(searchLower);
-      case filterByDate:
-        return sale.date?.includes(search);
-      default:
-        return true;
-    }
-  }) : [];
+        switch (true) {
+          case filterByName:
+            return sale.customerDetails?.name
+              ?.toLowerCase()
+              .includes(searchLower);
+          case filterByGst:
+            return sale.customerDetails?.gstIN
+              ?.toLowerCase()
+              .includes(searchLower);
+          case filterByDate:
+            return sale.date?.includes(search);
+          default:
+            return true;
+        }
+      })
+    : [];
 
   return (
     <div className="p-6 w-full mx-auto h-full overflow-y-hidden hide-scrollbar">
@@ -149,7 +157,8 @@ export const SalesOrderDashboard = ({ user }) => {
                       {sale.invoiceNo}
                     </p>
                     <p className="text-sm font-semibold text-gray-700 flex-1">
-                      {sale.customerDetails.gstIN || sale.customerDetails.contactNo}
+                      {sale.customerDetails.gstIN ||
+                        sale.customerDetails.contactNo}
                     </p>
                     <p className="text-lg font-bold text-gray-900 flex-1">
                       {sale.customerDetails.name}
@@ -159,7 +168,7 @@ export const SalesOrderDashboard = ({ user }) => {
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Subtotal:</span>
                         <span className="text-sm font-medium text-gray-800">
-                          ₹{((sale.finalAmt)-(sale.taxAmt)).toLocaleString()}
+                          ₹{(sale.finalAmt - sale.taxAmt).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -173,7 +182,7 @@ export const SalesOrderDashboard = ({ user }) => {
                           Total:
                         </span>
                         <span className="text-sm font-bold text-green-700">
-                          ₹{(sale.finalAmt).toLocaleString()}
+                          ₹{sale.finalAmt.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -221,7 +230,10 @@ export const SalesOrderDashboard = ({ user }) => {
                             </div>
                             <div className="flex justify-between text-sm my-1">
                               <span>Subtotal:</span>
-                              <span>₹{((sale.finalAmt)-(sale.taxAmt)).toLocaleString()}</span>
+                              <span>
+                                ₹
+                                {(sale.finalAmt - sale.taxAmt).toLocaleString()}
+                              </span>
                             </div>
                             <div className="flex justify-between text-sm my-1">
                               <span>Total Tax:</span>
@@ -229,12 +241,7 @@ export const SalesOrderDashboard = ({ user }) => {
                             </div>
                             <div className="flex justify-between font-bold text-green-700 mt-2 pt-2 border-t border-green-200">
                               <span>Grand Total:</span>
-                              <span>
-                                ₹
-                                {(
-                                  sale.finalAmt
-                                ).toLocaleString()}
-                              </span>
+                              <span>₹{sale.finalAmt.toLocaleString()}</span>
                             </div>
                           </div>
                         </div>
@@ -308,7 +315,8 @@ export const SalesOrderDashboard = ({ user }) => {
                                     <span className="text-gray-800">
                                       ₹
                                       {(
-                                        (item.units || item.perUnit) * item.unitCost
+                                        (item.units || item.perUnit) *
+                                        item.unitCost
                                       ).toLocaleString()}
                                     </span>
                                   </p>
@@ -317,7 +325,8 @@ export const SalesOrderDashboard = ({ user }) => {
                                       GST Amount:{" "}
                                     </span>
                                     <span className="text-blue-600">
-                                      ₹{(
+                                      ₹
+                                      {(
                                         ((item.units || item.perUnit) *
                                           item.unitCost *
                                           item.gstPer) /
@@ -332,7 +341,8 @@ export const SalesOrderDashboard = ({ user }) => {
                                     <span className="text-gray-800">
                                       ₹
                                       {(
-                                        (item.units || item.perUnit) * item.unitCost +
+                                        (item.units || item.perUnit) *
+                                          item.unitCost +
                                         ((item.units || item.perUnit) *
                                           item.unitCost *
                                           item.gstPer) /

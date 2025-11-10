@@ -38,7 +38,7 @@ const ProductsPage = ({ user }) => {
 
         const userID = user._id;
         const res = await axios.get(
-          `http://localhost:3000/api/items/all-items`,
+          `${import.meta.env.VITE_API_URL}/api/items/all-items`,
           {
             params: { userID: userID },
           }
@@ -62,16 +62,16 @@ const ProductsPage = ({ user }) => {
   }, [user]);
 
   const handleEditClick = (product) => {
-    setSelectedProduct(product); 
-    setIsDrawerOpen(true); 
+    setSelectedProduct(product);
+    setIsDrawerOpen(true);
   };
 
   const closeDrawer = () => {
-    setIsDrawerOpen(false); 
-    setSelectedProduct(null); 
+    setIsDrawerOpen(false);
+    setSelectedProduct(null);
   };
 
-   const handleProductUpdate = (updatedProduct) => {
+  const handleProductUpdate = (updatedProduct) => {
     // Add a safety check to ensure updatedProduct and its _id exist
     if (updatedProduct && updatedProduct._id) {
       setProducts((prevProducts) =>
@@ -120,7 +120,9 @@ const ProductsPage = ({ user }) => {
   if (!user || !user._id) {
     return (
       <div className="container mx-auto px-4 py-6">
-        <p className="text-center text-gray-500">User not found. Please log in.</p>
+        <p className="text-center text-gray-500">
+          User not found. Please log in.
+        </p>
       </div>
     );
   }

@@ -1,32 +1,32 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  FaArrowRight, 
-  FaHome, 
-  FaBox, 
-  FaShoppingCart, 
-  FaStore, 
-  FaWarehouse, 
-  FaSignOutAlt, 
+import {
+  FaArrowRight,
+  FaHome,
+  FaBox,
+  FaShoppingCart,
+  FaStore,
+  FaWarehouse,
+  FaSignOutAlt,
   FaUserCircle,
   FaUsers,
   FaHandshake,
   FaFileInvoiceDollar,
   FaClipboardList,
-  FaTag
+  FaTag,
 } from "react-icons/fa";
 import { MdDashboard } from "react-icons/md";
 import { ChevronUp, ChevronDown, ChevronRight } from "lucide-react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import logoImg from "../assets/logo258.svg";
-import simply from "../assets/simply.svg";  
-const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
+import simply from "../assets/simply.svg";
+const Sidebar = ({ toggleSidebar, isCollapsed, user, renderLoadingScree }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedItems, setExpandedItems] = useState({
     inventory: false,
     purchase: false,
-    sales: false
+    sales: false,
   });
 
   useEffect(() => {
@@ -34,13 +34,13 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
   }, [user]);
 
   const logout = () => {
-    window.open("http://localhost:3000/auth/logout", "_self");
+    window.open(`${import.meta.env.VITE_API_URL}/auth/logout`, "_self");
   };
 
   const toggleExpandItem = (item) => {
-    setExpandedItems(prev => ({
+    setExpandedItems((prev) => ({
       ...prev,
-      [item]: !prev[item]
+      [item]: !prev[item],
     }));
   };
 
@@ -53,10 +53,18 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
       {/* Sidebar Header */}
       <div className="w-full bg-gray-800 flex items-center justify-between p-4 h-[8.1%] transition-all duration-300 ease-in-out rounded-et-md">
         {isCollapsed && (
-          <img src={simply} alt="Logo" className="  pt-2  transition-all duration-300 ease-in-out" />
+          <img
+            src={simply}
+            alt="Logo"
+            className="  pt-2  transition-all duration-300 ease-in-out"
+          />
         )}
         {!isCollapsed && (
-          <img src={logoImg} alt="Logo" className=" p-2 pt-4 w-45 transition-all duration-300 ease-in-out" />
+          <img
+            src={logoImg}
+            alt="Logo"
+            className=" p-2 pt-4 w-45 transition-all duration-300 ease-in-out"
+          />
         )}
       </div>
 
@@ -72,33 +80,39 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
               <FaHome className="text-2xl text-cyan-300" />
               <span
                 className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                  isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto ml-5 "
+                  isCollapsed
+                    ? "opacity-0 w-0 overflow-hidden"
+                    : "opacity-100 w-auto ml-5 "
                 }`}
               >
                 Dashboard
               </span>
             </Link>
           </li>
-          
+
           {/* Inventory with dropdown */}
           <li>
-            <div 
+            <div
               className="flex items-center justify-between text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-              onClick={() => !isCollapsed && toggleExpandItem('inventory')}
+              onClick={() => !isCollapsed && toggleExpandItem("inventory")}
             >
               <div className="flex items-center">
-                <Link to="product" className="flex items-center rounded-md text-cyan-300">
-                <FaClipboardList className="text-2xl text-cyan-300" />
-                 
-                  <span 
-                  className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                    isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto ml-5"
-                  }`}
+                <Link
+                  to="product"
+                  className="flex items-center rounded-md text-cyan-300"
                 >
-                Inventory
-                </span>
-                 </Link>
-                
+                  <FaClipboardList className="text-2xl text-cyan-300" />
+
+                  <span
+                    className={`text-cyan-300 transition-all duration-300 ease-in-out ${
+                      isCollapsed
+                        ? "opacity-0 w-0 overflow-hidden"
+                        : "opacity-100 w-auto ml-5"
+                    }`}
+                  >
+                    Inventory
+                  </span>
+                </Link>
               </div>
               {/* {!isCollapsed && (
                 <ChevronRight 
@@ -107,7 +121,7 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
                 />
               )} */}
             </div>
-            
+
             {/* Inventory Submenu */}
             {/* {!isCollapsed && expandedItems.inventory && (
               <ul className="ml-8 mt-2 space-y-2">
@@ -126,45 +140,55 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
               </ul>
             )} */}
           </li>
-          
+
           {/* Purchase with dropdown */}
           <li>
-            <div 
+            <div
               className="flex items-center justify-between text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-              onClick={() => !isCollapsed && toggleExpandItem('purchase')}
+              onClick={() => !isCollapsed && toggleExpandItem("purchase")}
             >
               <div className="flex items-center">
-                <Link to="purchase/order" className="flex items-center rounded-md text-cyan-300">
-                <FaShoppingCart className="text-2xl text-cyan-300" />
-                 <span
-                  className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                    isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto ml-5"
-                  }`}
+                <Link
+                  to="purchase/order"
+                  className="flex items-center rounded-md text-cyan-300"
                 >
-                  Purchase
-                </span>
+                  <FaShoppingCart className="text-2xl text-cyan-300" />
+                  <span
+                    className={`text-cyan-300 transition-all duration-300 ease-in-out ${
+                      isCollapsed
+                        ? "opacity-0 w-0 overflow-hidden"
+                        : "opacity-100 w-auto ml-5"
+                    }`}
+                  >
+                    Purchase
+                  </span>
                 </Link>
-               
               </div>
               {!isCollapsed && (
-                <ChevronRight 
-                  size={18} 
-                  className={`text-cyan-300 transition-transform duration-300 ${expandedItems.purchase ? 'rotate-90' : ''}`}
+                <ChevronRight
+                  size={18}
+                  className={`text-cyan-300 transition-transform duration-300 ${expandedItems.purchase ? "rotate-90" : ""}`}
                 />
               )}
             </div>
-            
+
             {/* Purchase Submenu */}
             {!isCollapsed && expandedItems.purchase && (
               <ul className="ml-8 mt-2 space-y-2">
                 <li>
-                  <Link to="purchase/vendor" className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200">
+                  <Link
+                    to="purchase/vendor"
+                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
+                  >
                     <FaHandshake className="mr-3" />
                     <span>Vendors</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="purchase/order" className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200">
+                  <Link
+                    to="purchase/order"
+                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
+                  >
                     <FaFileInvoiceDollar className="mr-3" />
                     <span>Purchase Orders</span>
                   </Link>
@@ -172,45 +196,55 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
               </ul>
             )}
           </li>
-          
+
           {/* Sales with dropdown */}
           <li>
-            <div 
+            <div
               className="flex items-center justify-between text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-              onClick={() => !isCollapsed && toggleExpandItem('sales')}
+              onClick={() => !isCollapsed && toggleExpandItem("sales")}
             >
               <div className="flex items-center">
-                <Link to="sales/order" className="flex items-center rounded-md text-cyan-300">
-                  <FaStore className="text-2xl text-cyan-300" />
-                <span
-                  className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                    isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto ml-5"
-                  }`}
+                <Link
+                  to="sales/order"
+                  className="flex items-center rounded-md text-cyan-300"
                 >
-                  Sales
-                </span>
+                  <FaStore className="text-2xl text-cyan-300" />
+                  <span
+                    className={`text-cyan-300 transition-all duration-300 ease-in-out ${
+                      isCollapsed
+                        ? "opacity-0 w-0 overflow-hidden"
+                        : "opacity-100 w-auto ml-5"
+                    }`}
+                  >
+                    Sales
+                  </span>
                 </Link>
-                
               </div>
               {!isCollapsed && (
-                <ChevronRight 
-                  size={18} 
-                  className={`text-cyan-300 transition-transform duration-300 ${expandedItems.sales ? 'rotate-90' : ''}`}
+                <ChevronRight
+                  size={18}
+                  className={`text-cyan-300 transition-transform duration-300 ${expandedItems.sales ? "rotate-90" : ""}`}
                 />
               )}
             </div>
-            
+
             {/* Sales Submenu */}
             {!isCollapsed && expandedItems.sales && (
               <ul className="ml-8 mt-2 space-y-2">
                 <li>
-                  <Link to="sales/customer" className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200">
+                  <Link
+                    to="sales/customer"
+                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
+                  >
                     <FaUsers className="mr-3" />
                     <span>Customers</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="sales/order" className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200">
+                  <Link
+                    to="sales/order"
+                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
+                  >
                     <FaFileInvoiceDollar className="mr-3" />
                     <span>Sales Orders</span>
                   </Link>
@@ -218,7 +252,7 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
               </ul>
             )}
           </li>
-          
+
           {/* Warehouse */}
           <li>
             <Link
@@ -228,7 +262,9 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
               <FaWarehouse className="text-2xl text-cyan-300" />
               <span
                 className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                  isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto ml-5 "
+                  isCollapsed
+                    ? "opacity-0 w-0 overflow-hidden"
+                    : "opacity-100 w-auto ml-5 "
                 }`}
               >
                 Warehouses
@@ -257,7 +293,8 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
               </div>
             )}
           </div>
-          {!isCollapsed && (isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />)}
+          {!isCollapsed &&
+            (isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />)}
         </button>
 
         {/* Dropdown Menu */}
@@ -266,7 +303,7 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
             <div className="p-2">
               <button
                 className="flex items-center w-full p-2 text-left hover:bg-gray-500 rounded-md transition-colors"
-                onClick={() => window.location.href = "/profile"}
+                onClick={() => (window.location.href = "/profile")}
               >
                 <FaUserCircle className="mr-2" /> Profile
               </button>
@@ -286,7 +323,9 @@ const Sidebar = ({ toggleSidebar, isCollapsed, user ,renderLoadingScree}) => {
         onClick={toggleSidebar}
         className="bottom-[10%]  w-full right-[-15px] bg-cyan-300 text-gray-900  w-10 h-10 flex items-center justify-center shadow-md cursor-pointer transition-transform duration-300 ease-in-out "
       >
-        <FaArrowRight className={`${isCollapsed ? "rotate-0" : "rotate-180"}`}/>
+        <FaArrowRight
+          className={`${isCollapsed ? "rotate-0" : "rotate-180"}`}
+        />
       </div>
     </div>
   );

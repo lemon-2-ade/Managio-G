@@ -10,7 +10,7 @@ export default function SalesDrawers({ user }) {
   const [salesOrder, setSalesOrder] = useState({
     name: "",
     contactNo: "",
-    email:"",
+    email: "",
     salesID: "",
     date: "",
     invoiceNo: "",
@@ -91,7 +91,7 @@ export default function SalesDrawers({ user }) {
   //   // console.log(order);
   //   try {
   //     const response = await axios.get(
-  //       `http://localhost:3000/newCustomer/customer-list`,
+  //       `{import.meta.env.VITE_API_URL}/newCustomer/customer-list`,
   //       {
   //         params: { name: name },
   //       }
@@ -123,7 +123,7 @@ export default function SalesDrawers({ user }) {
     if (!itemCode) return;
     try {
       const response = await fetch(
-        `http://localhost:3000/hsn/hsnAdd/${itemCode}`
+        `${import.meta.env.VITE_API_URL}/hsn/hsnAdd/${itemCode}`
       );
       if (!response.ok) throw new Error("Item not found");
 
@@ -184,8 +184,10 @@ export default function SalesDrawers({ user }) {
 
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/warehouse/info`,
-          { params: { userID: user._id } }
+          `${import.meta.env.VITE_API_URL}/api/warehouse/info`,
+          {
+            params: { userID: user._id },
+          }
         );
         const data = response.data.warehouseDetails;
         // console.log("Warehouse Details:", data);
@@ -216,8 +218,10 @@ export default function SalesDrawers({ user }) {
       };
       // console.log("Sales Details:", salesDetails);
       const response = await axios.post(
-        `http://localhost:3000/api/sales/add-sales`,
-        { ...salesDetails }
+        `${import.meta.env.VITE_API_URL}/api/sales/add-sales`,
+        {
+          ...salesDetails,
+        }
       );
 
       // console.log("Sales Order Data:", salesOrder);
@@ -384,8 +388,6 @@ export default function SalesDrawers({ user }) {
                 </div>
 
                 <div className="grid grid-cols-2 gap-6">
-                  
-                  
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">
                       WarehouseID
@@ -448,7 +450,7 @@ export default function SalesDrawers({ user }) {
                             {warehouses?.flatMap((warehouse) =>
                               warehouse.items?.map((item) => (
                                 <option key={item._id} value={item.name}>
-                                  {item.name}  
+                                  {item.name}
                                 </option>
                               ))
                             )}

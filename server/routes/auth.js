@@ -2,6 +2,9 @@ import express from "express";
 import passport from "passport";
 import { fetchGoogleUser, refreshAccessToken } from "../utils/tokenHelper.js";
 import { User } from "../models/user.js";
+import dotenv from "dotenv";
+
+dotenv.config({ path: "../.env" });
 
 const router = express.Router();
 
@@ -30,7 +33,7 @@ router.get("/logout", (req, res) => {
     if (err) {
       return res.status(500).send("Logout failed");
     }
-    res.redirect("http://localhost:5173/");
+    res.redirect(`${process.env.CORS_ORIGIN}/`);
   });
 });
 
@@ -47,7 +50,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/auth/login/failed" }),
   (req, res) => {
-    res.redirect("http://localhost:5173/");
+    res.redirect(`${process.env.CORS_ORIGIN}/`);
   },
 );
 

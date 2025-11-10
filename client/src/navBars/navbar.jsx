@@ -1,5 +1,5 @@
 import { FaUserCircle, FaHome, FaBell, FaCog } from "react-icons/fa";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -20,7 +20,7 @@ const Navbar = ({ user }) => {
   }, [user]);
 
   const logout = () => {
-    window.open("http://localhost:3000/auth/logout", "_self");
+    window.open(`${import.meta.env.VITE_API_URL}/auth/logout`, "_self");
   };
 
   const navigationLinks = [
@@ -48,7 +48,7 @@ const Navbar = ({ user }) => {
     <div className="w-full h-[71px] bg-gray-800 shadow-md flex items-center justify-end px-[2%]">
       <div className="relative flex items-center h-full ml-">
         {/* Active/Hover Background */}
-        <motion.div 
+        <motion.div
           className="absolute h-10 w-10 bg-gradient-to-r from-cyan-500 to-cyan-400 rounded-lg shadow-lg"
           initial={false}
           animate={{
@@ -58,7 +58,7 @@ const Navbar = ({ user }) => {
           transition={{
             type: "spring",
             stiffness: 400,
-            damping: 30
+            damping: 30,
           }}
         />
 
@@ -78,17 +78,19 @@ const Navbar = ({ user }) => {
                 whileHover={{ y: -1 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className={`
+                <div
+                  className={`
                   flex items-center justify-center w-10 h-10 rounded-lg
                   transition-colors duration-200
-                  ${index === activeIndex ? 'text-gray-900' : 'text-cyan-300'}
-                  ${hoveredIndex === index && index !== activeIndex ? 'text-cyan-400' : ''}
-                `}>
+                  ${index === activeIndex ? "text-gray-900" : "text-cyan-300"}
+                  ${hoveredIndex === index && index !== activeIndex ? "text-cyan-400" : ""}
+                `}
+                >
                   {link.icon}
                 </div>
-                
+
                 <AnimatePresence>
-                  {(hoveredIndex === index && index !== activeIndex) && (
+                  {hoveredIndex === index && index !== activeIndex && (
                     <motion.div
                       initial={{ opacity: 0, y: 5 }}
                       animate={{ opacity: 1, y: 0 }}

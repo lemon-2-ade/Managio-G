@@ -15,9 +15,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import PurchaseDrawer from "@/drawers/purchaseDrawer";
 import ExcelImportDrawer from "@/drawers/exportPurchase1Drawer";
 import axios from "axios";
-import {  Wallet2 } from "lucide-react";
+import { Wallet2 } from "lucide-react";
 
-export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
+export const PurchaseOrderDashboard = ({ user, fetchUser }) => {
   const [search, setSearch] = useState("");
   const [purchases, setPurchases] = useState([]);
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -32,19 +32,19 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
       try {
         const userID = user._id;
         const res = await axios.get(
-          "http://localhost:3000/api/purchase/all-purchases",
+          `${import.meta.env.VITE_API_URL}/api/purchase/all-purchases`,
           { params: { userID } }
         );
         // console.log(res.data.purchaseDetails);
         // Ensure the fetched data is an array and clean the data
         if (Array.isArray(res.data.purchaseDetails)) {
-          const cleanedPurchases = res.data.purchaseDetails.map(purchase => ({
+          const cleanedPurchases = res.data.purchaseDetails.map((purchase) => ({
             ...purchase,
             finalAmt: purchase.finalAmt || 0,
             taxAmt: purchase.taxAmt || 0,
             supplierDetails: purchase.supplierDetails || {},
             items: purchase.items || [],
-            date: purchase.date || new Date().toISOString()
+            date: purchase.date || new Date().toISOString(),
           }));
           setPurchases(cleanedPurchases);
         } else {
@@ -70,33 +70,39 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
     });
   };
 
-  const filteredPurchases = Array.isArray(purchases) ? purchases.filter((purchase) => {
-    const searchLower = search.toLowerCase();
+  const filteredPurchases = Array.isArray(purchases)
+    ? purchases.filter((purchase) => {
+        const searchLower = search.toLowerCase();
 
-    switch (true) {
-      case filterByName:
-        return purchase.supplierDetails?.name?.toLowerCase().includes(searchLower);
-      case filterByGst:
-        return purchase.supplierDetails?.gstIN?.toLowerCase().includes(searchLower);
-      case filterByDate:
-        return filterDataByDate([purchase]).length > 0;
-      default:
-        return true;
-    }
-  }) : [];
+        switch (true) {
+          case filterByName:
+            return purchase.supplierDetails?.name
+              ?.toLowerCase()
+              .includes(searchLower);
+          case filterByGst:
+            return purchase.supplierDetails?.gstIN
+              ?.toLowerCase()
+              .includes(searchLower);
+          case filterByDate:
+            return filterDataByDate([purchase]).length > 0;
+          default:
+            return true;
+        }
+      })
+    : [];
 
   return (
     <div className="p-6 w-full mx-auto h-full overflow-y-hidden hide-scrollbar ">
       <div className="w-full bg-gradient-to-r from-blue-50 to-blue-100 rounded-3xl p-6 shadow-sm mb-8">
-          <div className="flex items-center gap-4">
-            <div className="bg-white p-3 rounded-2xl shadow-sm">
-              <Wallet2 className="w-6 h-6 text-blue-500" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
-              Purchase Order Details
-            </h1>
+        <div className="flex items-center gap-4">
+          <div className="bg-white p-3 rounded-2xl shadow-sm">
+            <Wallet2 className="w-6 h-6 text-blue-500" />
           </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Purchase Order Details
+          </h1>
         </div>
+      </div>
       <div className=" relative top-0 flex space-x-4  items-center pr-6 pl-6  justify-center items-center ">
         <Input
           type="text"
@@ -147,7 +153,7 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <PurchaseDrawer user={user}  fetchUser={fetchUser}/>
+        <PurchaseDrawer user={user} fetchUser={fetchUser} />
         <ExcelImportDrawer user={user} />
       </div>
       <div className="pl-6 pr-6 pb-5 transparent w-full h-[80%] mx-auto overflow-y-auto hide-scrollbar max-h-[80vh] flex flex-col z-[-30]">
@@ -166,23 +172,28 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
                 >
                   <div className="flex items-center justify-between space-x-4 p-2 rounded-lg">
                     <p className="text-sm font-semibold text-gray-700 w-24">
-                      {new Date(purchase.date || Date.now()).toLocaleDateString()}
+                      {new Date(
+                        purchase.date || Date.now()
+                      ).toLocaleDateString()}
                     </p>
                     <p className="text-sm font-semibold text-gray-700 w-28">
-                      {purchase.invoiceNo || 'N/A'}
+                      {purchase.invoiceNo || "N/A"}
                     </p>
                     <p className="text-sm font-semibold text-gray-700 flex-1">
-                      {purchase.supplierDetails?.gstIN || 'N/A'}
+                      {purchase.supplierDetails?.gstIN || "N/A"}
                     </p>
                     <p className="text-lg font-bold text-gray-900 flex-1">
-                      {purchase.supplierDetails?.name || 'Unknown Supplier'}
+                      {purchase.supplierDetails?.name || "Unknown Supplier"}
                     </p>
 
                     <div className="flex flex-col space-y-1 w-48 mr-2">
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Subtotal:</span>
                         <span className="text-sm font-medium text-gray-800">
-                          ₹{((purchase.finalAmt)-(purchase.taxAmt)).toLocaleString()}
+                          ₹
+                          {(
+                            purchase.finalAmt - purchase.taxAmt
+                          ).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -196,7 +207,7 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
                           Total:
                         </span>
                         <span className="text-sm font-bold text-green-700">
-                          ₹{(purchase.finalAmt).toLocaleString()}
+                          ₹{purchase.finalAmt.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -230,7 +241,7 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
                               Purchase ID
                             </p>
                             <p className="text-lg font-mono text-blue-700 text-center">
-                              #{purchase.invoiceNo || 'N/A'}
+                              #{purchase.invoiceNo || "N/A"}
                             </p>
                           </div>
 
@@ -244,7 +255,13 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
                             </div>
                             <div className="flex justify-between text-sm my-1">
                               <span>Subtotal:</span>
-                              <span> ₹{((purchase.finalAmt)-(purchase.taxAmt)).toLocaleString()}</span>
+                              <span>
+                                {" "}
+                                ₹
+                                {(
+                                  purchase.finalAmt - purchase.taxAmt
+                                ).toLocaleString()}
+                              </span>
                             </div>
                             <div className="flex justify-between text-sm my-1">
                               <span>Total Tax:</span>
@@ -252,7 +269,7 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
                             </div>
                             <div className="flex justify-between font-bold text-green-700 mt-2 pt-2 border-t border-green-200">
                               <span>Grand Total:</span>
-                              <span>₹{(purchase.finalAmt).toLocaleString()}</span>
+                              <span>₹{purchase.finalAmt.toLocaleString()}</span>
                             </div>
                           </div>
                         </div>
@@ -263,7 +280,9 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
                               Date:{" "}
                             </span>
                             <span className="text-gray-800">
-                              {new Date(purchase.date || Date.now()).toLocaleDateString()}
+                              {new Date(
+                                purchase.date || Date.now()
+                              ).toLocaleDateString()}
                             </span>
                           </div>
 
@@ -287,14 +306,14 @@ export const PurchaseOrderDashboard = ({ user ,fetchUser}) => {
                               >
                                 <div className="flex justify-between items-center mb-2">
                                   <h4 className="font-semibold text-blue-600">
-                                    {item.name || 'Unnamed Item'}
+                                    {item.name || "Unnamed Item"}
                                   </h4>
                                   <div className="flex space-x-3">
                                     <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                      Item Code: {item.itemCode || 'N/A'}
+                                      Item Code: {item.itemCode || "N/A"}
                                     </span>
                                     <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                                      HSN: {item.hsnCode || 'N/A'}
+                                      HSN: {item.hsnCode || "N/A"}
                                     </span>
                                   </div>
                                 </div>
