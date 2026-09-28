@@ -1,18 +1,16 @@
 import express from "express";
-import mongoose from "mongoose";
 import { Purchase } from "../models/purchase.js";
 import { Supplier } from "../models/supplier.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+router.use(verifyFirebaseToken);
 
 router.get("/all-suppliers", async (req, res) => {
   try {
-    const { userID } = req.query;
+    const existingSuppliers = await Supplier.findOne({ userID: req.user._id });
 
-    let existingSuppliers = await Supplier.findOne({ userID: userID });
-    existingSuppliers = existingSuppliers.supplierDetails;
-
-    res.status(200).json(existingSuppliers);
+    res.status(200).json(existingSuppliers?.supplierDetails || []);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Server error" });
@@ -20,7 +18,7 @@ router.get("/all-suppliers", async (req, res) => {
 });
 
 router.get("/top-suppliers", async (req, res) => {
-  const { fromDate, toDate, userID } = req.query;
+  const { fromDate, toDate } = req.query;
 
   const startDate = fromDate ? new Date(fromDate) : new Date("1996-01-01");
   const endDate = toDate ? new Date(toDate) : new Date();
@@ -29,7 +27,7 @@ router.get("/top-suppliers", async (req, res) => {
     const topSuppliers = await Purchase.aggregate([
       {
         $match: {
-          userID: new mongoose.Types.ObjectId(userID),
+          userID: req.user._id,
         },
       },
       { $unwind: "$purchaseDetails" },

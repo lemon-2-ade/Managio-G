@@ -1,24 +1,18 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import {
-  ChevronDown,
-  Settings,
-  MapPin,
-  ClipboardList,
-  Package,
-  PhoneCall,
-  Building,
-  ListFilter,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from 'react';
+import api from '@/lib/axios';
+import { MapPin, Package, Building, Search, Warehouse as WarehouseIcon } from 'lucide-react';
+import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import ErrorState from "@/components/errors/ErrorState";
+import EmptyState from "@/components/errors/EmptyState";
 
 const WarehouseDetails = ({ user }) => {
   const [warehouses, setWarehouses] = useState([]);
@@ -33,24 +27,14 @@ const WarehouseDetails = ({ user }) => {
     setLoading(true);
     try {
       const userID = user._id;
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/warehouse/info`,
-        {
-          params: { userID: userID },
-          withCredentials: true,
-        }
-      );
+      const { data } = await api.get(`/api/warehouse/info`, {
+        params: { userID: userID },
+      });
 
       setWarehouses(data.warehouseDetails || []);
       setError(null);
-
-      // Auto-select first warehouse if exists
-      if (data.warehouseDetails && data.warehouseDetails.length > 0) {
-        setSelectedWarehouse(data.warehouseDetails[0]);
-      }
     } catch (err) {
-      console.error("Error fetching warehouse details:", err);
-      setError("Failed to fetch warehouse details");
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -58,187 +42,162 @@ const WarehouseDetails = ({ user }) => {
 
   useEffect(() => {
     fetchWarehouseDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id]);
 
-  const filteredWarehouses = warehouses.filter((warehouse) =>
+  const filteredWarehouses = warehouses.filter(warehouse =>
     warehouse.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Loading warehouses...</p>
-      </div>
-    );
-  }
-
   if (error) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
+    return <ErrorState error={error} onRetry={fetchWarehouseDetail} className="min-h-screen justify-center" />;
   }
 
   return (
-    <div className="flex h-full ">
-      {/* Left Sidebar - Warehouse List */}
-      <div className="w-1/3 border-r p-6 bg-gray-50 overflow-y-auto ">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4 ">Warehouses</h1>
-
-          {/* Search and Filter */}
-          <div className="flex items-center space-x-2 mb-4">
-            <Input
-              placeholder="Search warehouses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-grow"
-            />
-            <Button variant="outline" size="icon">
-              <ListFilter className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Warehouse List */}
-          <div className="space-y-4">
-            {filteredWarehouses.map((warehouse) => (
-              <Card
-                key={warehouse._id}
-                className={`cursor-pointer hover:border-blue-500 transition-all ${
-                  selectedWarehouse?._id === warehouse._id
-                    ? "border-blue-500 border-2"
-                    : "border-gray-200"
-                }`}
-                onClick={() => setSelectedWarehouse(warehouse)}
-              >
-                <CardHeader className="p-4 pb-2">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">{warehouse.name}</h3>
-                    <div className="text-sm text-gray-500">
-                      {warehouse.location.city}
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <Progress
-                    value={warehouse.perUsed || 0}
-                    className="h-2 mt-2"
-                  />
-                  <div className="text-xs text-gray-500 mt-1 text-right">
-                    {warehouse.perUsed || 0}% Utilized
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+    <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 md:px-8">
+      {/* Header */}
+      <Card className="flex items-center gap-3 p-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+          <WarehouseIcon size={19} />
         </div>
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight">Warehouses</h1>
+          <p className="text-xs text-muted-foreground">
+            {warehouses.length} warehouse{warehouses.length === 1 ? "" : "s"} tracked
+          </p>
+        </div>
+      </Card>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search warehouses..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="max-w-sm pl-9"
+        />
       </div>
 
-      {/* Right Details Panel */}
-      <div className="w-2/3 p-8 overflow-y-auto">
-        {selectedWarehouse ? (
-          <div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-bold text-gray-800">
-                  {selectedWarehouse.name}
-                </h2>
-                {/* <div className="flex space-x-2">
-                  <Button variant="outline">Edit</Button>
-                  <Button variant="destructive">Delete</Button>
-                </div> */}
+      {/* Grid */}
+      {loading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full" />
+          ))}
+        </div>
+      ) : filteredWarehouses.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredWarehouses.map((warehouse) => (
+            <Card
+              key={warehouse._id}
+              className="cursor-pointer p-4 transition-shadow hover:shadow-md"
+              onClick={() => setSelectedWarehouse(warehouse)}
+            >
+              <div className="mb-3 flex items-start justify-between gap-2">
+                <h3 className="truncate text-sm font-semibold">{warehouse.name}</h3>
+                <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                  <MapPin size={11} /> {warehouse.location.city}
+                </span>
               </div>
 
-              {/* Detailed Warehouse Information */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Location Details */}
+              <Progress value={warehouse.perUsed || 0} className="h-1.5" />
+              <div className="mt-1.5 flex items-center justify-between text-[11px] text-muted-foreground">
+                <span>{warehouse.perUsed || 0}% utilized</span>
+                <span className="font-mono">{warehouse.totalCapacity} sq ft</span>
+              </div>
+
+              <div className="mt-3 flex items-center gap-1.5 border-t pt-3 text-xs text-muted-foreground">
+                <Package size={12} />
+                {warehouse.items?.length || 0} item{warehouse.items?.length === 1 ? "" : "s"} stored
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          icon={WarehouseIcon}
+          title={searchTerm ? "No warehouses found" : "No warehouses yet"}
+          message={searchTerm ? "Try a different search term." : "Add a warehouse from your profile to see it here."}
+        />
+      )}
+
+      {/* Detail modal */}
+      <Dialog open={!!selectedWarehouse} onOpenChange={(open) => !open && setSelectedWarehouse(null)}>
+        <DialogContent className="max-h-[85vh] max-w-xl overflow-y-auto">
+          {selectedWarehouse && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedWarehouse.name}</DialogTitle>
+              </DialogHeader>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <div className="flex items-center mb-4">
-                    <MapPin className="mr-2 text-blue-500" />
-                    <h3 className="text-xl font-semibold">Location</h3>
+                  <div className="mb-2 flex items-center gap-2">
+                    <MapPin size={14} className="text-primary" />
+                    <h3 className="text-sm font-semibold">Location</h3>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="rounded-md bg-accent/50 p-3 text-sm text-muted-foreground">
                     <p>{selectedWarehouse.location.line1}</p>
-                    {selectedWarehouse.location.line2 && (
-                      <p>{selectedWarehouse.location.line2}</p>
-                    )}
+                    {selectedWarehouse.location.line2 && <p>{selectedWarehouse.location.line2}</p>}
                     <p>
-                      {selectedWarehouse.location.city},
-                      {selectedWarehouse.location.state}
+                      {selectedWarehouse.location.city}, {selectedWarehouse.location.state}
                     </p>
                     <p>
-                      {selectedWarehouse.location.country} -
-                      {selectedWarehouse.location.pincode}
+                      {selectedWarehouse.location.country} — {selectedWarehouse.location.pincode}
                     </p>
                   </div>
                 </div>
 
-                {/* Capacity Details */}
                 <div>
-                  <div className="flex items-center mb-4">
-                    <Building className="mr-2 text-blue-500" />
-                    <h3 className="text-xl font-semibold">Capacity</h3>
+                  <div className="mb-2 flex items-center gap-2">
+                    <Building size={14} className="text-primary" />
+                    <h3 className="text-sm font-semibold">Capacity</h3>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between mb-2">
-                      <span>Total Capacity:</span>
-                      <span className="font-medium">
-                        {selectedWarehouse.totalCapacity} sq ft
-                      </span>
+                  <div className="rounded-md bg-accent/50 p-3 text-sm">
+                    <div className="mb-2 flex justify-between">
+                      <span className="text-muted-foreground">Total capacity</span>
+                      <span className="font-mono font-medium">{selectedWarehouse.totalCapacity} sq ft</span>
                     </div>
-                    <div className="flex justify-between mb-2">
-                      <span>Utilized:</span>
-                      <span className="font-medium">
-                        {selectedWarehouse.perUsed}%
-                      </span>
+                    <div className="mb-2 flex justify-between">
+                      <span className="text-muted-foreground">Utilized</span>
+                      <span className="font-mono font-medium">{selectedWarehouse.perUsed}%</span>
                     </div>
-                    <Progress
-                      value={selectedWarehouse.perUsed}
-                      className="h-2 mt-2"
-                    />
+                    <Progress value={selectedWarehouse.perUsed} className="mt-1 h-1.5" />
                   </div>
                 </div>
               </div>
 
-              {/* Items in Warehouse */}
-              <div className="mt-8">
-                <div className="flex items-center mb-4">
-                  <Package className="mr-2 text-blue-500" />
-                  <h3 className="text-xl font-semibold">Items</h3>
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <Package size={14} className="text-primary" />
+                  <h3 className="text-sm font-semibold">Items</h3>
                 </div>
-                {selectedWarehouse.items &&
-                selectedWarehouse.items.length > 0 ? (
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left p-2">Item Name</th>
-                          <th className="text-right p-2">Quantity</th>
+                {selectedWarehouse.items && selectedWarehouse.items.length > 0 ? (
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-xs text-muted-foreground">
+                        <th className="pb-2 font-medium">Item name</th>
+                        <th className="pb-2 text-right font-medium">Quantity</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedWarehouse.items.map((item, index) => (
+                        <tr key={index} className="border-b last:border-b-0">
+                          <td className="py-2">{item.name}</td>
+                          <td className="py-2 text-right font-mono">{item.units}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {selectedWarehouse.items.map((item, index) => (
-                          <tr key={index} className="border-b last:border-b-0">
-                            <td className="p-2">{item.name}</td>
-                            <td className="text-right p-2">{item.units}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      ))}
+                    </tbody>
+                  </table>
                 ) : (
-                  <p className="text-gray-500">No items in this warehouse</p>
+                  <p className="text-sm text-muted-foreground">No items in this warehouse</p>
                 )}
               </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-center items-center h-full text-gray-500">
-            Select a warehouse to view details
-          </div>
-        )}
-      </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

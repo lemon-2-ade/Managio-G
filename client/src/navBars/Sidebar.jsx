@@ -1,331 +1,180 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
 import {
-  FaArrowRight,
-  FaHome,
-  FaBox,
-  FaShoppingCart,
-  FaStore,
-  FaWarehouse,
-  FaSignOutAlt,
-  FaUserCircle,
-  FaUsers,
-  FaHandshake,
-  FaFileInvoiceDollar,
-  FaClipboardList,
-  FaTag,
-} from "react-icons/fa";
-import { MdDashboard } from "react-icons/md";
-import { ChevronUp, ChevronDown, ChevronRight } from "lucide-react";
+  LayoutDashboard,
+  ClipboardList,
+  ShoppingCart,
+  Store,
+  Warehouse,
+  Users,
+  Handshake,
+  FileText,
+  ChevronsLeft,
+  ChevronsRight,
+  ChevronUp,
+  ChevronDown,
+  UserCircle,
+  LogOut,
+} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-import logoImg from "../assets/logo258.svg";
-import simply from "../assets/simply.svg";
-const Sidebar = ({ toggleSidebar, isCollapsed, user, renderLoadingScree }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [expandedItems, setExpandedItems] = useState({
-    inventory: false,
-    purchase: false,
-    sales: false,
-  });
+import logoMark from "../assets/simply.svg";
+import { useAuth } from "../context/AuthContext.jsx";
 
-  useEffect(() => {
-    // console.log("User Data:", user);
-  }, [user]);
+const NAV_ITEMS = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, match: (p) => p === "/dashboard" },
+  { to: "product", label: "Inventory", icon: ClipboardList, match: (p) => p.startsWith("/dashboard/product") },
+  { to: "purchase/order", label: "Purchases", icon: ShoppingCart, match: (p) => p.startsWith("/dashboard/purchase") },
+  { to: "sales/order", label: "Sales", icon: Store, match: (p) => p.startsWith("/dashboard/sales") },
+  { to: "warehouse", label: "Warehouse", icon: Warehouse, match: (p) => p.startsWith("/dashboard/warehouse") },
+];
 
-  const logout = () => {
-    window.open(`${import.meta.env.VITE_API_URL}/auth/logout`, "_self");
-  };
+const PURCHASE_SUBLINKS = [
+  { to: "purchase/vendor", label: "Vendors", icon: Handshake },
+  { to: "purchase/order", label: "Purchase Orders", icon: FileText },
+];
 
-  const toggleExpandItem = (item) => {
-    setExpandedItems((prev) => ({
-      ...prev,
-      [item]: !prev[item],
-    }));
+const SALES_SUBLINKS = [
+  { to: "sales/customer", label: "Customers", icon: Users },
+  { to: "sales/order", label: "Sales Orders", icon: FileText },
+];
+
+const Sidebar = ({ toggleSidebar, isCollapsed, user }) => {
+  const { logout } = useAuth();
+  const { pathname } = useLocation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const subLinksFor = (label) => {
+    if (label === "Purchases") return PURCHASE_SUBLINKS;
+    if (label === "Sales") return SALES_SUBLINKS;
+    return null;
   };
 
   return (
     <div
-      className={`h-screen text-gray-900 flex flex-col bg-gray-200 shadow-3xl rounded-e-md transition-all duration-300 ease-in-out ${
+      className={`flex h-full flex-col bg-[#0a1a20] transition-[width] duration-200 ${
         isCollapsed ? "w-16" : "w-60"
       }`}
     >
-      {/* Sidebar Header */}
-      <div className="w-full bg-gray-800 flex items-center justify-between p-4 h-[8.1%] transition-all duration-300 ease-in-out rounded-et-md">
-        {isCollapsed && (
-          <img
-            src={simply}
-            alt="Logo"
-            className="  pt-2  transition-all duration-300 ease-in-out"
-          />
-        )}
+      {/* Brand */}
+      <div className="flex h-14 shrink-0 items-center gap-2.5 px-4">
+        <img src={logoMark} alt="" className="h-6 w-6 shrink-0" />
         {!isCollapsed && (
-          <img
-            src={logoImg}
-            alt="Logo"
-            className=" p-2 pt-4 w-45 transition-all duration-300 ease-in-out"
-          />
+          <span className="truncate text-[15px] font-semibold tracking-tight text-white">
+            Managio
+          </span>
         )}
       </div>
 
-      {/* Navigation Items */}
-      <div className="flex-1 bg-gradient-to-b from-gray-800 to-gray-700 overflow-y-auto hide-scrollbar">
-        <ul className="mt-12 flex flex-col gap-2 pt-2 m-1 gap-8">
-          {/* Dashboard */}
-          <li>
-            <Link
-              to="/"
-              className="flex items-center text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-            >
-              <FaHome className="text-2xl text-cyan-300" />
-              <span
-                className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                  isCollapsed
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto ml-5 "
-                }`}
-              >
-                Dashboard
-              </span>
-            </Link>
-          </li>
-
-          {/* Inventory with dropdown */}
-          <li>
-            <div
-              className="flex items-center justify-between text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-              onClick={() => !isCollapsed && toggleExpandItem("inventory")}
-            >
-              <div className="flex items-center">
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto px-3 py-2 hide-scrollbar">
+        <ul className="flex flex-col gap-0.5">
+          {NAV_ITEMS.map(({ to, label, icon: Icon, match }) => {
+            const active = match(pathname);
+            const subLinks = !isCollapsed ? subLinksFor(label) : null;
+            return (
+              <li key={label}>
                 <Link
-                  to="product"
-                  className="flex items-center rounded-md text-cyan-300"
+                  to={to}
+                  title={isCollapsed ? label : undefined}
+                  className={`flex items-center gap-3 rounded-md px-2.5 py-2 text-[13px] font-medium transition-colors ${
+                    active
+                      ? "bg-teal-500/15 text-teal-300"
+                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                  }`}
                 >
-                  <FaClipboardList className="text-2xl text-cyan-300" />
-
-                  <span
-                    className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                      isCollapsed
-                        ? "opacity-0 w-0 overflow-hidden"
-                        : "opacity-100 w-auto ml-5"
-                    }`}
-                  >
-                    Inventory
-                  </span>
+                  <Icon size={17} className="shrink-0" />
+                  {!isCollapsed && <span className="truncate">{label}</span>}
                 </Link>
-              </div>
-              {/* {!isCollapsed && (
-                <ChevronRight 
-                  size={18} 
-                  className={`text-cyan-300 transition-transform duration-300 ${expandedItems.inventory ? 'rotate-90' : ''}`}
-                />
-              )} */}
-            </div>
-
-            {/* Inventory Submenu */}
-            {/* {!isCollapsed && expandedItems.inventory && (
-              <ul className="ml-8 mt-2 space-y-2">
-                <li>
-                  <Link to="product" className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200">
-                    <FaBox className="mr-3" />
-                    <span>Products</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/product/price-list" className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200">
-                    <FaTag className="mr-3" />
-                    <span>Price List</span>
-                  </Link>
-                </li>
-              </ul>
-            )} */}
-          </li>
-
-          {/* Purchase with dropdown */}
-          <li>
-            <div
-              className="flex items-center justify-between text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-              onClick={() => !isCollapsed && toggleExpandItem("purchase")}
-            >
-              <div className="flex items-center">
-                <Link
-                  to="purchase/order"
-                  className="flex items-center rounded-md text-cyan-300"
-                >
-                  <FaShoppingCart className="text-2xl text-cyan-300" />
-                  <span
-                    className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                      isCollapsed
-                        ? "opacity-0 w-0 overflow-hidden"
-                        : "opacity-100 w-auto ml-5"
-                    }`}
-                  >
-                    Purchase
-                  </span>
-                </Link>
-              </div>
-              {!isCollapsed && (
-                <ChevronRight
-                  size={18}
-                  className={`text-cyan-300 transition-transform duration-300 ${expandedItems.purchase ? "rotate-90" : ""}`}
-                />
-              )}
-            </div>
-
-            {/* Purchase Submenu */}
-            {!isCollapsed && expandedItems.purchase && (
-              <ul className="ml-8 mt-2 space-y-2">
-                <li>
-                  <Link
-                    to="purchase/vendor"
-                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
-                  >
-                    <FaHandshake className="mr-3" />
-                    <span>Vendors</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="purchase/order"
-                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
-                  >
-                    <FaFileInvoiceDollar className="mr-3" />
-                    <span>Purchase Orders</span>
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </li>
-
-          {/* Sales with dropdown */}
-          <li>
-            <div
-              className="flex items-center justify-between text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-              onClick={() => !isCollapsed && toggleExpandItem("sales")}
-            >
-              <div className="flex items-center">
-                <Link
-                  to="sales/order"
-                  className="flex items-center rounded-md text-cyan-300"
-                >
-                  <FaStore className="text-2xl text-cyan-300" />
-                  <span
-                    className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                      isCollapsed
-                        ? "opacity-0 w-0 overflow-hidden"
-                        : "opacity-100 w-auto ml-5"
-                    }`}
-                  >
-                    Sales
-                  </span>
-                </Link>
-              </div>
-              {!isCollapsed && (
-                <ChevronRight
-                  size={18}
-                  className={`text-cyan-300 transition-transform duration-300 ${expandedItems.sales ? "rotate-90" : ""}`}
-                />
-              )}
-            </div>
-
-            {/* Sales Submenu */}
-            {!isCollapsed && expandedItems.sales && (
-              <ul className="ml-8 mt-2 space-y-2">
-                <li>
-                  <Link
-                    to="sales/customer"
-                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
-                  >
-                    <FaUsers className="mr-3" />
-                    <span>Customers</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="sales/order"
-                    className="flex items-center py-2 px-3 rounded-md text-cyan-300 hover:bg-gray-600 transition-all duration-200"
-                  >
-                    <FaFileInvoiceDollar className="mr-3" />
-                    <span>Sales Orders</span>
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </li>
-
-          {/* Warehouse */}
-          <li>
-            <Link
-              to="warehouse"
-              className="flex items-center text-lg p-3 rounded-md cursor-pointer bg-opacity-50 hover:bg-cyan-500 hover:text-gray-900 transition-all duration-300 ease-in-out"
-            >
-              <FaWarehouse className="text-2xl text-cyan-300" />
-              <span
-                className={`text-cyan-300 transition-all duration-300 ease-in-out ${
-                  isCollapsed
-                    ? "opacity-0 w-0 overflow-hidden"
-                    : "opacity-100 w-auto ml-5 "
-                }`}
-              >
-                Warehouses
-              </span>
-            </Link>
-          </li>
+                {subLinks && active && (
+                  <ul className="ml-[1.55rem] mt-0.5 flex flex-col gap-0.5 border-l border-white/10 pl-3">
+                    {subLinks.map((sub) => {
+                      const subActive = pathname.endsWith(sub.to);
+                      return (
+                        <li key={sub.to}>
+                          <Link
+                            to={sub.to}
+                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-[12.5px] transition-colors ${
+                              subActive
+                                ? "text-teal-300 font-medium"
+                                : "text-slate-500 hover:text-slate-300"
+                            }`}
+                          >
+                            <sub.icon size={13} className="shrink-0" />
+                            <span className="truncate">{sub.label}</span>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
         </ul>
+      </nav>
+
+      {/* Collapse toggle */}
+      <div className="px-3 pb-1">
+        <button
+          onClick={toggleSidebar}
+          className="flex w-full items-center gap-3 rounded-md px-2.5 py-2 text-[12px] font-medium text-slate-500 transition-colors hover:bg-white/5 hover:text-slate-300"
+        >
+          {isCollapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
+          {!isCollapsed && <span>Collapse</span>}
+        </button>
       </div>
 
-      {/* Sidebar Footer with User Profile */}
-      <div className="relative bg-gray-700 text-gray-300 p-3 h-20 flex items-center">
+      {/* User footer */}
+      <div className="relative border-t border-white/10 p-3">
         <button
-          className="flex items-center justify-between w-full text-left rounded-md duration-300"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsMenuOpen((v) => !v)}
+          className="flex w-full items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-white/5"
         >
-          <div className="flex items-center space-x-3 w-full">
+          {user?.profileImg ? (
             <img
-              src={user?.profileImg}
-              alt="User"
-              className="w-10 h-10 rounded-full border border-gray-500"
+              src={user.profileImg}
+              alt=""
+              className="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-white/10"
             />
-            {!isCollapsed && (
-              <div className="  w-full overflow-x-hidden hide-scroll">
-                <p className="font-semibold truncate">{user?.name}</p>
-                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
+          ) : (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-600 text-[12px] font-semibold text-white">
+              {user?.name?.[0]?.toUpperCase() || "?"}
+            </div>
+          )}
+          {!isCollapsed && (
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[12.5px] font-semibold text-slate-200">
+                  {user?.name || "Account"}
+                </p>
+                <p className="truncate text-[11px] text-slate-500">{user?.email}</p>
               </div>
-            )}
-          </div>
-          {!isCollapsed &&
-            (isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />)}
+              {isMenuOpen ? (
+                <ChevronUp size={15} className="shrink-0 text-slate-500" />
+              ) : (
+                <ChevronDown size={15} className="shrink-0 text-slate-500" />
+              )}
+            </>
+          )}
         </button>
 
-        {/* Dropdown Menu */}
-        {isOpen && !isCollapsed && (
-          <div className="absolute bottom-[110%] left-0 w-full bg-gray-600 border border-gray-700 rounded-md shadow-lg">
-            <div className="p-2">
-              <button
-                className="flex items-center w-full p-2 text-left hover:bg-gray-500 rounded-md transition-colors"
-                onClick={() => (window.location.href = "/profile")}
-              >
-                <FaUserCircle className="mr-2" /> Profile
-              </button>
-              <button
-                className="flex items-center w-full p-2 text-left hover:bg-gray-500 rounded-md transition-colors"
-                onClick={logout}
-              >
-                <FaSignOutAlt className="mr-2" /> Log out
-              </button>
-            </div>
+        {isMenuOpen && !isCollapsed && (
+          <div className="absolute bottom-[calc(100%+4px)] left-3 right-3 overflow-hidden rounded-lg border border-white/10 bg-[#0f242c] shadow-xl">
+            <Link
+              to="/profile"
+              className="flex items-center gap-2.5 px-3 py-2.5 text-[13px] text-slate-300 transition-colors hover:bg-white/5"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <UserCircle size={16} /> Profile
+            </Link>
+            <button
+              onClick={logout}
+              className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left text-[13px] text-red-400 transition-colors hover:bg-white/5"
+            >
+              <LogOut size={16} /> Log out
+            </button>
           </div>
         )}
-      </div>
-
-      {/* Toggle Button */}
-      <div
-        onClick={toggleSidebar}
-        className="bottom-[10%]  w-full right-[-15px] bg-cyan-300 text-gray-900  w-10 h-10 flex items-center justify-center shadow-md cursor-pointer transition-transform duration-300 ease-in-out "
-      >
-        <FaArrowRight
-          className={`${isCollapsed ? "rotate-0" : "rotate-180"}`}
-        />
       </div>
     </div>
   );

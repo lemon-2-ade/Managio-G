@@ -1,5 +1,6 @@
 import express from "express";
 import { publicCustomer } from "../models/publicCustomers.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -27,9 +28,9 @@ router.post("/customer-add", async (req, res) => {
   }
 });
 
-router.post("/customer/personal", async (req, res) => {
+router.post("/customer/personal", verifyFirebaseToken, async (req, res) => {
   try {
-    const { userID, customerName, contactNo, emailAddress, address } = req.body;
+    const { customerName, contactNo, emailAddress, address } = req.body;
     // console.log(req.body);
 
     const existingCustomer = await publicCustomer.findOne({
@@ -41,7 +42,7 @@ router.post("/customer/personal", async (req, res) => {
       return res.status(400).json({ error: "Customer already exists" });
     } else {
       const publicnewCustomer = new publicCustomer({
-        userID,
+        userID: req.user._id,
         customerName,
         contactNo,
         emailAddress,

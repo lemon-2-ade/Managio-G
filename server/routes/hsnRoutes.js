@@ -3,32 +3,37 @@ import { HSNItem } from "../models/hsnCodes.js";
 
 const router = express.Router();
 
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-router.get("/hsnAdd", async (req, res) => {
+router.get("/search", async (req, res) => {
     try {
-        const data = await HSNItem.find();
-        console.log(" Retrieved Records:", data.length);
-        res.json(data);
+        const q = (req.query.q || "").trim();
+        if (q.length < 2) {
+            return res.status(200).json([]);
+        }
+
+        const regex = new RegExp(escapeRegex(q), "i");
+        const results = await HSNItem.find(
+            { $or: [{ HSN_CD: regex }, { HSN_Description: regex }] },
+            { HSN_CD: 1, HSN_Description: 1, GST_Rate: 1 }
+        ).limit(25);
+
+        res.status(200).json(results);
     } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error searching HSN codes:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
-
-router.get("/hsnAdd/:item_code", async (req, res) => {
+router.get("/hsnAdd/:hsn_code", async (req, res) => {
     try {
-        const { item_code } = req.params;
-        // console.log("Searching for HSN Code:", item_code);
-
-        const item = await HSNItem.findOne({item_code});
+        const { hsn_code } = req.params;
+        const item = await HSNItem.findOne({ HSN_CD: hsn_code });
 
         if (!item) {
-            // console.log(" HSN Code Not Found:", item_code);
             return res.status(404).json({ error: "HSN Code not found" });
         }
 
-        // console.log(" HSN Code Found:", item);
         res.json(item);
     } catch (error) {
         console.error("Error fetching HSN details:", error);

@@ -1,42 +1,19 @@
-import React from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
 
 const WarehouseLoadingSkeleton = () => {
   return (
-    <div className="animate-pulse bg-white p-6">
-      <div className="flex space-x-4">
-        {/* Sidebar Loading Skeleton */}
-        <div className="w-[400px] space-y-4 mt-10">
-          <div className="h-10 bg-gray-300 rounded"></div>
-          
-          {/* Warehouse List Skeleton */}
-          {[1, 2,3,4,5].map((item) => (
-            <div key={item} className="bg-gray-200 h-[100px] rounded-lg mt-10"></div>
-          ))}
-        </div>
+    <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 md:px-8">
+      {/* Header */}
+      <Skeleton className="h-[70px] w-full" />
 
-        {/* Main Content Loading Skeleton */}
-        <div className="flex-1 space-y-6 mt-10">
-          {/* Warehouse Name */}
-          {/* <div className="h-8 bg-gray-300 w-1/2 rounded"></div> */}
+      {/* Search */}
+      <Skeleton className="h-10 w-full max-w-sm" />
 
-          {/* Location and Capacity Sections */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="bg-gray-200 h-40 rounded-lg"></div>
-            <div className="bg-gray-200 h-40 rounded-lg"></div>
-          </div>
-
-          {/* Items Table Skeleton */}
-          <div className="bg-gray-200 h-[500px] rounded-lg">
-            <div className="grid grid-cols-2 gap-4 p-4">
-              {[1, 2, 3, 4, 5].map((row) => (
-                <div key={row} className="flex justify-between">
-                  <div className="h-15 bg-gray-300 w-1/2 rounded"></div>
-                  <div className="h-15 bg-gray-300 w-1/4 rounded"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* Grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-40 w-full" />
+        ))}
       </div>
     </div>
   );

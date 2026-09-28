@@ -5,8 +5,11 @@ import { Purchase } from "../models/purchase.js";
 import { Supplier } from "../models/supplier.js";
 import { User } from "../models/user.js";
 import { Warehouse } from "../models/warehouse.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
+import { getIO } from "../socket.js";
 
 const router = express.Router();
+router.use(verifyFirebaseToken);
 
 async function getItemsByWarehouseID(userID, warehouseID) {
   try {
@@ -50,6 +53,38 @@ async function calculateCosts(items) {
   });
 
   return { finalAmt, taxAmt };
+}
+
+async function validateWarehouseCapacity(userID, warehouseID, items) {
+  const warehouseDoc = await Warehouse.findOne({
+    userID,
+    "warehouseDetails._id": warehouseID,
+  });
+  const warehouseDetails = warehouseDoc?.warehouseDetails.find(
+    (warehouse) => warehouse._id.toString() === warehouseID
+  );
+
+  if (!warehouseDetails) {
+    return "Selected warehouse could not be found.";
+  }
+
+  // An unset capacity means the warehouse has no declared space limit yet.
+  if (warehouseDetails.capacity === undefined || warehouseDetails.capacity === null || warehouseDetails.capacity === "") {
+    return null;
+  }
+
+  const remaining = Number(warehouseDetails.capacity);
+  if (Number.isNaN(remaining)) {
+    return null;
+  }
+
+  const incomingUnits = (items || []).reduce((sum, item) => sum + (Number(item.units) || 0), 0);
+
+  if (incomingUnits > remaining) {
+    return `This warehouse only has ${remaining} unit(s) of capacity remaining (requested ${incomingUnits}).`;
+  }
+
+  return null;
 }
 
 async function addNewEntries(purchaseDetails) {
@@ -242,7 +277,16 @@ async function updateEntries(purchaseDetails) {
         if (item.unitCost > existingItem.unitCost) {
           existingItem.unitCost = item.unitCost;
         }
-        
+        if (item.hsnCode) {
+          existingItem.hsnCode = item.hsnCode;
+        }
+        if (item.itemCode) {
+          existingItem.itemCode = item.itemCode;
+        }
+        if (item.gstPer) {
+          existingItem.gstPer = item.gstPer;
+        }
+
         existingItem.totalUnits += item.units;
         const warehouse = existingItem.warehouses.find(
           (warehouse) => warehouse._id.toString() === warehouseID
@@ -320,7 +364,7 @@ async function updateEntries(purchaseDetails) {
 
 router.get("/all-purchases", async (req, res) => {
   try {
-    const { userID } = req.query;
+    const userID = req.user._id;
     const query = Purchase.findOne({ userID: userID });
     const doc = await query.exec();
 
@@ -340,25 +384,39 @@ router.get("/all-purchases", async (req, res) => {
 router.post("/add-purchase", async (req, res) => {
   try {
     const purchaseDetails = req.body;
+    purchaseDetails.userID = req.user._id;
+
+    const capacityError = await validateWarehouseCapacity(
+      purchaseDetails.userID,
+      purchaseDetails.warehouseID,
+      purchaseDetails.items
+    );
+    if (capacityError) {
+      return res.status(400).json({ error: capacityError });
+    }
+
     let purchaseQuery = Purchase.findOne({ userID: purchaseDetails.userID });
     const existingUser = await purchaseQuery.exec();
-    
+
     if (!existingUser) {
       await addNewEntries(purchaseDetails);
     } else {
       await updateEntries(purchaseDetails);
     }
 
+    getIO().to(String(req.user._id)).emit("dashboard:refresh");
     res.status(200).json({ message: "success" });
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: "Something went wrong while creating the purchase order." });
   }
 });
 
 router.get("/report", async (req, res) => {
   try {
-    const { userID, purchaseID } = req.query;
-    
+    const userID = req.user._id;
+    const { purchaseID } = req.query;
+
     let purchaseReport = await Purchase.findOne({
       userID: userID,
       "purchaseDetails._id": purchaseID,
@@ -376,13 +434,14 @@ router.get("/report", async (req, res) => {
 
 router.get("/total-purchase", async (req, res) => {
   try {
-    const { userID, fromDate, toDate } = req.query;
+    const userID = req.user._id;
+    const { fromDate, toDate } = req.query;
 
     const startDate = fromDate ? new Date(fromDate) : new Date();
     const endDate = toDate ? new Date(toDate) : new Date();
 
     const totalPurchase = await Purchase.aggregate([
-      { $match: { userID: new mongoose.Types.ObjectId(userID) } },
+      { $match: { userID: userID } },
       { $unwind: "$purchaseDetails" },
       {
         $match: {

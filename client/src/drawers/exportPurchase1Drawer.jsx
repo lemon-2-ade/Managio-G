@@ -22,7 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import axios from "axios";
+import api from "@/lib/axios";
+import { toast } from "sonner";
 
 // Schema validation function for purchase data
 const validateAgainstSchema = (data) => {
@@ -476,7 +477,7 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
     console.log("Purchase Order Data:", jsonData); // Debugging log
 
     if (!jsonData || jsonData.length === 0) {
-      alert("No valid data to import.");
+      toast.error("No valid data to import.");
       return;
     }
 
@@ -486,8 +487,8 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
 
     for (const purchase of jsonData) {
       try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/purchase/add-purchase`,
+        const response = await api.post(
+          `/api/purchase/add-purchase`,
           purchase
         );
 
@@ -504,9 +505,12 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
 
     setIsLoading(false);
 
-    alert(
-      `Purchase order import completed. Success: ${successCount}, Failures: ${failureCount}`
-    );
+    const summaryMessage = `Purchase order import completed. Success: ${successCount}, Failures: ${failureCount}`;
+    if (failureCount === 0) {
+      toast.success(summaryMessage);
+    } else {
+      toast.error(summaryMessage);
+    }
     onImportComplete(jsonData);
     setIsOpen(false);
     setFile(null);
@@ -602,7 +606,7 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
             )}
 
             {isLoading && (
-              <p className="text-sm text-gray-500">Processing file...</p>
+              <p className="text-sm text-muted-foreground">Processing file…</p>
             )}
 
             {excelData && excelData.length > 0 && (
@@ -640,7 +644,7 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
                       </TableBody>
                     </Table>
                     {excelData.length > 5 && (
-                      <p className="text-xs text-gray-500 mt-2 px-4 pb-2">
+                      <p className="text-xs text-muted-foreground mt-2 px-4 pb-2">
                         ... and {excelData.length - 5} more rows
                       </p>
                     )}
@@ -650,8 +654,8 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
             )}
 
             {jsonData && (
-              <div className="mb-4 p-2 border rounded bg-green-50">
-                <p className="text-sm text-green-700">
+              <div className="mb-4 p-2 border rounded bg-accent">
+                <p className="text-sm text-accent-foreground">
                   {jsonData.length} valid purchase records found with{" "}
                   {jsonData.reduce((total, p) => total + p.items.length, 0)}{" "}
                   total items
@@ -660,7 +664,7 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
             )}
 
             {debug && (
-              <div className="mb-4 p-2 border rounded bg-gray-50 text-xs text-gray-500 font-mono">
+              <div className="mb-4 p-2 border rounded bg-muted text-xs text-muted-foreground font-mono">
                 <pre>{debug}</pre>
               </div>
             )}
@@ -668,7 +672,7 @@ const ExcelImportDrawer = ({ onImportComplete, user }) => {
 
           <DrawerFooter>
             <div className="flex items-center justify-between w-full">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 {jsonData
                   ? `${jsonData.length} valid records ready to import`
                   : "No valid records found"}

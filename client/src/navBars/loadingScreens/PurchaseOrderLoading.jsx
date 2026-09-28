@@ -1,48 +1,45 @@
+import { Skeleton } from "@/components/ui/skeleton";
+
 const PurchaseOrderSkeleton = () => {
   return (
-    <div className="p-6 w-full">
+    <div className="mx-auto max-w-7xl px-4 py-6 md:px-8">
       {/* Header */}
-      <div className="flex items-center mb-6">
-        <div className="h-8 w-64 bg-gray-200 animate-pulse rounded mr-4"></div>
-        <div className="flex ml-auto space-x-4">
-          <div className="h-10 w-20 bg-gray-200 animate-pulse rounded"></div>
-          <div className="h-10 w-28 bg-gray-200 animate-pulse rounded"></div>
-          <div className="h-10 w-36 bg-gray-200 animate-pulse rounded"></div>
+      <div className="mb-5 flex items-center justify-between">
+        <Skeleton className="h-7 w-48" />
+        <div className="flex gap-3">
+          <Skeleton className="h-9 w-24" />
+          <Skeleton className="h-9 w-32" />
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="flex items-center mb-6">
-        <div className="ml-6 mr-6 h-10 mt-20 w-[1000px] bg-gray-200 animate-pulse rounded mb-6"></div>
-      <div className="ml-6 mr-6 h-10 mt-20 w-[200px] bg-gray-200 animate-pulse rounded mb-6"></div>
-
+      {/* Search */}
+      <div className="mb-5 flex items-center gap-3">
+        <Skeleton className="h-10 flex-1" />
+        <Skeleton className="h-10 w-32" />
       </div>
-      
 
-      {/* Purchase Order Entries */}
-      {[1, 2, 3, 4, 5].map((item) => (
-        <div 
-          key={item} 
-          className="ml-6 mr-6 bg-gray-100 rounded-lg p-4 mb-4 border border-gray-200 flex items-center"
-        >
-          <div className="flex-grow">
-            <div className="flex space-x-4 mb-2">
-              <div className="h-5 w-24 bg-gray-200 animate-pulse rounded"></div>
-              <div className="h-5 w-48 bg-gray-200 animate-pulse rounded"></div>
-              <div className="h-5 w-32 bg-gray-200 animate-pulse rounded"></div>
+      {/* Order rows */}
+      <div className="space-y-3">
+        {Array.from({ length: 5 }).map((_, item) => (
+          <div key={item} className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-2">
+              <div className="flex gap-4">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-4 w-28" />
+              </div>
+              <div className="flex gap-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-24" />
+              </div>
             </div>
-            <div className="flex space-x-4">
-              <div className="h-5 w-40 bg-gray-200 animate-pulse rounded"></div>
-              <div className="h-5 w-32 bg-gray-200 animate-pulse rounded"></div>
+            <div className="flex flex-col items-end gap-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-16" />
             </div>
           </div>
-          <div className="flex flex-col items-end space-y-2">
-            <div className="h-5 w-24 bg-gray-200 animate-pulse rounded"></div>
-            <div className="h-5 w-20 bg-gray-200 animate-pulse rounded"></div>
-            <div className="h-5 w-28 bg-gray-200 animate-pulse rounded"></div>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

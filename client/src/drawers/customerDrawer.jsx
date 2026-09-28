@@ -11,7 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import axios from "axios";
+import api from "@/lib/axios";
+import { showError } from "@/lib/errors";
 
 const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
   const [formData, setFormData] = React.useState({
@@ -44,32 +45,22 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const submitData = { ...formData };
+    setIsSubmitting(true);
 
     try {
-      const userID = user._id;
-      console.log(userID);
-
-      const newCustomerPersonal = await axios.post(
-        `${import.meta.env.VITE_API_URL}/newCustomer/customer/personal`,
-        { userID, ...submitData },
-        { withCredentials: true }
-      );
-      console.log(newCustomerPersonal.data);
-      alert("Customer Already exists");
-
-      const newCustomer = await axios.post(
-        `${import.meta.env.VITE_API_URL}/newCustomer/customer-add`,
-        submitData,
-        { withCredentials: true }
-      );
-      console.log(newCustomer.data);
+      await api.post("/newCustomer/customer/personal", submitData);
+      await api.post("/newCustomer/customer-add", submitData);
       toast.success("Customer added successfully!");
       resetForm();
       onClose();
     } catch (error) {
-      console.error("Error adding customer:", error);
-      // setErrors({ form: "Failed to add customer. Please try again." });
-      alert("Failed to add customer. Please try again.");
+      if (error.response?.status === 400 && error.response.data?.error) {
+        toast.error(error.response.data.error);
+      } else {
+        showError(error, "Couldn't add customer");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -100,14 +91,9 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <div className="bg-red-50 p-3 rounded-md flex items-start gap-2 text-red-700 text-sm">
-            {/* <toast className="h-5 w-5 text-red-500 mt-0.5" /> */}
-            <p>{errors.form}</p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="customerNo" className="text-gray-700">
-              Customer/GST ID <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <Label htmlFor="customerNo">
+              Customer/GST ID <span className="text-destructive">*</span>
             </Label>
             <Input
               id="customerNo"
@@ -115,16 +101,13 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
               value={formData.customerNo}
               onChange={handleChange}
               placeholder="GSTIN27AADCB2230M1ZY/CUST-2020"
-              className={
-                errors.customerNo ? "border-red-300 focus:border-red-500" : ""
-              }
+              className={errors.customerNo ? "border-destructive focus-visible:ring-destructive" : ""}
             />
-
-            <p className="text-sm text-red-500">{errors.customerNo}</p>
+            {errors.customerNo && <p className="text-xs text-destructive">{errors.customerNo}</p>}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="customerNo" className="text-gray-700">
-              Customer/GST ID <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <Label htmlFor="customerName">
+              Customer name <span className="text-destructive">*</span>
             </Label>
             <Input
               id="customerName"
@@ -132,17 +115,14 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
               value={formData.customerName}
               onChange={handleChange}
               placeholder="Aryan Bishwas"
-              className={
-                errors.customerName ? "border-red-300 focus:border-red-500" : ""
-              }
+              className={errors.customerName ? "border-destructive focus-visible:ring-destructive" : ""}
             />
-
-            <p className="text-sm text-red-500">{errors.customerNo}</p>
+            {errors.customerName && <p className="text-xs text-destructive">{errors.customerName}</p>}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="contactNo" className="text-gray-700">
-              Contact Number <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <Label htmlFor="contactNo">
+              Contact number <span className="text-destructive">*</span>
             </Label>
             <Input
               id="contactNo"
@@ -150,17 +130,14 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
               value={formData.contactNo}
               onChange={handleChange}
               placeholder="+91 98765 43210"
-              className={
-                errors.contactNo ? "border-red-300 focus:border-red-500" : ""
-              }
+              className={errors.contactNo ? "border-destructive focus-visible:ring-destructive" : ""}
             />
-
-            <p className="text-sm text-red-500">{errors.contactNo}</p>
+            {errors.contactNo && <p className="text-xs text-destructive">{errors.contactNo}</p>}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="emailAddress" className="text-gray-700">
-              Email Address <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <Label htmlFor="emailAddress">
+              Email address <span className="text-destructive">*</span>
             </Label>
             <Input
               id="emailAddress"
@@ -169,18 +146,14 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
               value={formData.emailAddress}
               onChange={handleChange}
               placeholder="customer@example.com"
-              className={
-                errors.emailAddress ? "border-red-300 focus:border-red-500" : ""
-              }
+              className={errors.emailAddress ? "border-destructive focus-visible:ring-destructive" : ""}
             />
-            {errors.emailAddress && (
-              <p className="text-sm text-red-500">{errors.emailAddress}</p>
-            )}
+            {errors.emailAddress && <p className="text-xs text-destructive">{errors.emailAddress}</p>}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="address" className="text-gray-700">
-              Business Address <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <Label htmlFor="address">
+              Business address <span className="text-destructive">*</span>
             </Label>
             <Textarea
               id="address"
@@ -189,30 +162,17 @@ const AddCustomerModal = ({ isOpen, onClose, onAddCustomer, user }) => {
               onChange={handleChange}
               placeholder="Enter full business address..."
               rows={3}
-              className={
-                errors.address ? "border-red-300 focus:border-red-500" : ""
-              }
+              className={errors.address ? "border-destructive focus-visible:ring-destructive" : ""}
             />
-
-            <p className="text-sm text-red-500">{errors.address}</p>
+            {errors.address && <p className="text-xs text-destructive">{errors.address}</p>}
           </div>
 
           <DialogFooter className="mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="mr-2"
-            >
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-cyan-400 hover:bg-cyan-900 transition-colors"
-            >
-              {isSubmitting ? "Adding..." : "Add Customer"}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Adding…" : "Add customer"}
             </Button>
           </DialogFooter>
         </form>

@@ -1,6 +1,6 @@
 import express from "express";
-import passport from "passport";
-import { fetchGoogleUser, refreshAccessToken } from "../utils/tokenHelper.js";
+import { auth, isConfigured } from "../config/firebaseAdmin.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
 import { User } from "../models/user.js";
 import dotenv from "dotenv";
 
@@ -8,101 +8,45 @@ dotenv.config({ path: "../.env" });
 
 const router = express.Router();
 
-router.get("/login/success", async (req, res) => {
-  if (req.user) {
-    const user = await User.findById(req.user._id);
-    res.status(200).json({
-      error: false,
-      message: "Successfully Logged in",
-      user: user,
-    });
-  } else {
-    res.status(403).json({ error: true, message: "Not authorized" });
-  }
-});
+router.post("/sync", async (req, res) => {
+  const authHeader = req.headers.authorization || "";
+  const idToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
-router.get("/login/failed", (req, res) => {
-  res.status(401).json({
-    error: true,
-    message: "Login failed",
-  });
-});
-
-router.get("/logout", (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return res.status(500).send("Logout failed");
-    }
-    res.redirect(`${process.env.CORS_ORIGIN}/`);
-  });
-});
-
-router.get(
-  "/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    accessType: "online",
-    prompt: "consent",
-  }),
-);
-
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/auth/login/failed" }),
-  (req, res) => {
-    res.redirect(`${process.env.CORS_ORIGIN}/`);
-  },
-);
-
-router.get("/user", async (req, res) => {
-  if (!req.isAuthenticated()) {
+  if (!idToken) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
+  if (!isConfigured) {
+    return res.status(500).json({ error: "Firebase Admin not configured" });
+  }
+
   try {
-    const user = await User.findById(req.user._id);
+    const decoded = await auth().verifyIdToken(idToken);
+    const authType = decoded.firebase?.sign_in_provider === "google.com" ? "google" : "password";
 
-    // Check if token expired and refresh it
-    if (!user.accessToken) {
-      return res.status(401).json({ error: "No access token found" });
-    }
+    let user = await User.findOne({ firebaseUid: decoded.uid });
 
-    let googleUser = await fetchGoogleUser(user.accessToken);
-
-    // If token is expired, refresh it
-    if (!googleUser || googleUser.error) {
-      console.log("Access token expired, refreshing...");
-      const newAccessToken = await refreshAccessToken(user.refreshToken);
-
-      if (!newAccessToken) {
-        return res.status(401).json({ error: "Failed to refresh token" });
-      }
-
-      // Update user with new token
-      user.accessToken = newAccessToken;
+    if (!user) {
+      user = new User({
+        firebaseUid: decoded.uid,
+        email: decoded.email,
+        name: decoded.name || "",
+        profileImg: decoded.picture || undefined,
+        authType,
+        isNewUser: true,
+      });
       await user.save();
-
-      // Fetch user data again
-      googleUser = await fetchGoogleUser(newAccessToken);
     }
 
-    res.json({ user: googleUser });
+    res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ error: "Server error" });
+    console.error("Error in /auth/sync:", error.message);
+    res.status(401).json({ error: "Invalid or expired token" });
   }
 });
 
-// router.put("/user/update",async (req,res)=>{
-//     if(!req.isAuthenticated()){
-//         return res.status(401).json({error:"Not Authenticated"})
-//     }
-//     else{
-//         try{
-//             const user = await new User.findUpdateById(req.user._id);
-//             user.name = req.body.name;
-
-//         }
-//     }
-// })
+router.get("/user", verifyFirebaseToken, (req, res) => {
+  res.status(200).json(req.user);
+});
 
 export default router;

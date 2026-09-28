@@ -1,13 +1,15 @@
 import express from "express";
-import mongoose from "mongoose";
 
 import { User } from "../models/user.js";
 import { Warehouse } from "../models/warehouse.js";
 import { Sales } from "../models/sales.js";
 import { Item } from "../models/items.js";
 import { Customer } from "../models/customers.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
+import { getIO } from "../socket.js";
 
 const router = express.Router();
+router.use(verifyFirebaseToken);
 
 async function calculateCosts(items) {
   let finalAmt = 0;
@@ -23,6 +25,43 @@ async function calculateCosts(items) {
   });
 
   return { finalAmt, taxAmt };
+}
+
+async function validateStockAvailability(userID, warehouseID, items) {
+  const warehouseDoc = await Warehouse.findOne({
+    userID,
+    "warehouseDetails._id": warehouseID,
+  });
+  const warehouseDetails = warehouseDoc?.warehouseDetails.find(
+    (warehouse) => warehouse._id.toString() === warehouseID
+  );
+
+  if (!warehouseDetails) {
+    return "Selected warehouse could not be found.";
+  }
+
+  for (const item of items || []) {
+    if (!item.name) {
+      return "Select a product for every item before submitting.";
+    }
+    if (!item.units || item.units <= 0) {
+      return `Enter a quantity greater than 0 for "${item.name}".`;
+    }
+
+    const warehouseItem = warehouseDetails.items.find(
+      (whItem) => whItem.name === item.name
+    );
+    const available = warehouseItem?.units ?? 0;
+
+    if (available <= 0) {
+      return `"${item.name}" is out of stock in this warehouse.`;
+    }
+    if (item.units > available) {
+      return `Only ${available} unit(s) of "${item.name}" available in this warehouse (requested ${item.units}).`;
+    }
+  }
+
+  return null;
 }
 
 async function addNewEntries(salesDetails) {
@@ -109,6 +148,7 @@ async function addNewEntries(salesDetails) {
 
     if (existingItem) {
       existingItem.totalUnits -= item.units;
+      existingItem.unitsSolds = (existingItem.unitsSolds || 0) + item.units;
       const warehouse = existingItem.warehouses.find(
         (warehouse) => warehouse._id.toString() === warehouseID
       );
@@ -220,6 +260,7 @@ async function updateEntries(salesDetails) {
 
     existingItem.totalUnits -= item.units;
     if (existingItem.totalUnits < 0) existingItem.totalUnits = 0;
+    existingItem.unitsSolds = (existingItem.unitsSolds || 0) + item.units;
 
     const warehouse = existingItem.warehouses.find(
       (warehouse) => warehouse._id.toString() === warehouseID
@@ -251,8 +292,8 @@ async function updateEntries(salesDetails) {
 
 router.get("/all-sales", async (req, res) => {
   try {
-    const { userID } = req.query;
-    
+    const userID = req.user._id;
+
     const query = Sales.findOne({ userID: userID });
     const doc = await query.exec();
     
@@ -272,6 +313,17 @@ router.get("/all-sales", async (req, res) => {
 router.post("/add-sales", async (req, res) => {
   try {
     const salesDetails = req.body;
+    salesDetails.userID = req.user._id;
+
+    const stockError = await validateStockAvailability(
+      salesDetails.userID,
+      salesDetails.warehouseID,
+      salesDetails.items
+    );
+    if (stockError) {
+      return res.status(400).json({ error: stockError });
+    }
+
     let salesQuery = Sales.findOne({ userID: salesDetails.userID });
     const existingUser = await salesQuery.exec();
 
@@ -281,15 +333,18 @@ router.post("/add-sales", async (req, res) => {
       await updateEntries(salesDetails);
     }
 
+    getIO().to(String(req.user._id)).emit("dashboard:refresh");
     res.status(200).json({ message: "success" });
   } catch (error) {
     console.log(error.message);
+    res.status(500).json({ error: "Something went wrong while creating the sales order." });
   }
 });
 
 router.get("/report", async (req, res) => {
   try {
-    const { userID, salesID } = req.query;
+    const userID = req.user._id;
+    const { salesID } = req.query;
 
     let salesReport = await Sales.findOne({
       userID: userID,
@@ -309,7 +364,8 @@ router.get("/report", async (req, res) => {
 
 router.get("/total-sales", async (req, res) => {
   try {
-    const { userID, fromDate, toDate } = req.query;
+    const userID = req.user._id;
+    const { fromDate, toDate } = req.query;
 
     const startDate = fromDate ? new Date(fromDate) : new Date("1996-01-01");
     const endDate = toDate ? new Date(toDate) : new Date();
@@ -317,7 +373,7 @@ router.get("/total-sales", async (req, res) => {
     let totalSales = await Sales.aggregate([
       {
         $match: {
-          userID: new mongoose.Types.ObjectId(userID),
+          userID: userID,
         },
       },
       { $unwind: "$salesDetails" },
@@ -354,24 +410,25 @@ router.get("/total-sales", async (req, res) => {
 
 router.get("/profit-loss", async (req, res) => {
   try {
-    const { userID, fromDate, toDate } = req.query;
+    const userID = req.user._id;
+    const { fromDate, toDate } = req.query;
 
     const startDate = fromDate ? new Date(fromDate) : new Date("1996-01-01");
     const endDate = toDate ? new Date(toDate) : new Date();
 
-    let itemDetails = await Item.findOne(
+    const itemDoc = await Item.findOne(
       { userID: userID },
       {
         "itemDetails.name": 1,
         "itemDetails.unitCost": 1
       }
     );
-    itemDetails = itemDetails.itemDetails;
+    const itemDetails = itemDoc?.itemDetails || [];
 
-    let salesDetails = await Sales.findOne(
+    const salesDoc = await Sales.findOne(
       { userID: userID },
     );
-    salesDetails = salesDetails.salesDetails;
+    const salesDetails = salesDoc?.salesDetails || [];
 
     let profit = 0, loss = 0;
 

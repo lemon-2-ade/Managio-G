@@ -1,20 +1,21 @@
 import express from "express";
-import mongoose from "mongoose";
 
 import { Sales } from "../models/sales.js";
 import { Customer } from "../models/customers.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+router.use(verifyFirebaseToken);
 
 router.get("/top-customers", async (req, res) => {
-  const { fromDate, toDate, userID } = req.query;
+  const { fromDate, toDate } = req.query;
 
   const startDate = fromDate ? new Date(fromDate) : new Date("1996-01-01");
   const endDate = toDate ? new Date(toDate) : new Date();
 
   try {
     const topCustomers = await Sales.aggregate([
-      { $match: { userID: new mongoose.Types.ObjectId(userID) } },
+      { $match: { userID: req.user._id } },
       { $unwind: "$salesDetails" },
       {
         $match: {
@@ -58,11 +59,9 @@ router.get("/top-customers", async (req, res) => {
 
 router.get("/all-customers", async (req, res) => {
   try {
-    const { userID } = req.query;
-    let existingCustomers = await Customer.findOne({ userID: userID });
-    existingCustomers = existingCustomers.customerDetails;
+    const existingCustomers = await Customer.findOne({ userID: req.user._id });
 
-    res.status(200).json(existingCustomers);
+    res.status(200).json(existingCustomers?.customerDetails || []);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Server error" });

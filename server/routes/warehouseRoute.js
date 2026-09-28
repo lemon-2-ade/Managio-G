@@ -1,14 +1,16 @@
 import express from "express";
-import mongoose from "mongoose";
 import { User } from "../models/user.js";
 import { Warehouse } from "../models/warehouse.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+router.use(verifyFirebaseToken);
 
 // work in progress
 router.post("/item-add", async (req, res) => {
   try {
-    const { userID, warehouseDetails } = req.body;
+    const userID = req.user._id;
+    const { warehouseDetails } = req.body;
     let query = Warehouse.findOne({ userID: userID });
     const existingWarehouse = await query.exec();
 
@@ -24,7 +26,8 @@ router.post("/item-add", async (req, res) => {
 
 router.post("/info-add", async (req, res) => {
   try {
-    const { userID, warehouseDetails } = req.body;
+    const userID = req.user._id;
+    const { warehouseDetails } = req.body;
 
     const newWarehouses = new Warehouse({ userID, warehouseDetails });
     await newWarehouses.save().then((data) => {
@@ -49,7 +52,8 @@ router.post("/info-add", async (req, res) => {
 });
 
 router.put("/info-update", async (req, res) => {
-  const { userID, warehouseDetails } = req.body;
+  const userID = req.user._id;
+  const { warehouseDetails } = req.body;
 
   for (const warehouse of warehouseDetails) {
     let query = Warehouse.findOne({
@@ -107,7 +111,7 @@ router.put("/info-update", async (req, res) => {
 
 router.get("/info", async (req, res) => {
   try {
-    const { userID } = req.query;
+    const userID = req.user._id;
 
     let query = Warehouse.findOne({ userID: userID });
     const existingWarehouses = await query.exec();
@@ -136,7 +140,8 @@ router.get("/info", async (req, res) => {
 });
 
 router.delete("/info-delete", async (req, res) => {
-  const { userID, warehouseID } = req.query;
+  const userID = req.user._id;
+  const { warehouseID } = req.query;
 
   let query = Warehouse.findOne({ userID: userID });
   let doc = await query.exec();
@@ -175,7 +180,8 @@ router.delete("/info-delete", async (req, res) => {
 });
 
 router.put("/item-update", async (req, res) => {
-  const { userID, warehouseDetails } = req.body;
+  const userID = req.user._id;
+  const { warehouseDetails } = req.body;
 
   const warehouseQuery = await Warehouse.findOne({ userID: userID });
   const existingWarehouses = warehouseQuery.warehouseDetails;
@@ -214,7 +220,8 @@ router.put("/item-update", async (req, res) => {
 // work under progress
 router.get("/available-space", async (req, res) => {
   try {
-    const { userID, warehouseID } = req.query;
+    const userID = req.user._id;
+    const { warehouseID } = req.query;
     
     let query = Warehouse.findOne(
       {

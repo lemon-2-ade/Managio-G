@@ -10,6 +10,7 @@ import PurchaseVendor from "@/pages/purchaseVendors";
 import WarehouseDetails from "@/pages/wareHousePage";
 import InventoryManagement from "@/pages/landingpage";
 import { SalesOrderDashboard } from "@/pages/salesorderDashboard";
+import NotFound from "@/pages/NotFound";
 
 
 export default function AppRoutes({ user, fetchUser }) {
@@ -23,14 +24,16 @@ export default function AppRoutes({ user, fetchUser }) {
       />
 
       
-      <Route 
-        path="/profile" 
-        element={user ? <Profile user={user} refreshUser={fetchUser} /> : <Navigate to="/login" />} 
-      />
+      <Route
+        path="/profile"
+        element={user ? <Bar user={user} /> : <Navigate to="/login" />}
+      >
+        <Route index element={<Profile user={user} refreshUser={fetchUser} />} />
+      </Route>
 
-     
-      <Route 
-        path="dashboard" 
+
+      <Route
+        path="dashboard"
         element={user ? <Bar user={user} /> : <Navigate to="/login" />}
       >
         <Route index element={<HomePage user={user} />} />
@@ -41,6 +44,8 @@ export default function AppRoutes({ user, fetchUser }) {
         <Route path="purchase/vendor" element={<PurchaseVendor user={user}/>} />
         <Route path="warehouse" element={<WarehouseDetails user={user} />} />
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

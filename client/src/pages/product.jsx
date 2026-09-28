@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -9,15 +8,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FaSearch, FaFilter, FaEdit, FaBoxOpen } from "react-icons/fa";
-import { ShoppingBag } from "lucide-react";
-import axios from "axios";
+import { Search, Pencil, PackageSearch, ShoppingBag, LoaderCircle } from "lucide-react";
+import api from "@/lib/axios";
 import EditProductPopup from "@/drawers/productDrawer";
+import ErrorState from "@/components/errors/ErrorState";
 
 const ProductsPage = ({ user }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [filters, setFilters] = useState({
     stockStatus: "all",
     minPrice: "",
@@ -27,38 +27,27 @@ const ProductsPage = ({ user }) => {
   const [selectedProduct, setSelectedProduct] = useState(null); // State for selected product
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); // State for drawer visibility
 
+  const fetchItemsDetail = async () => {
+    if (!user || !user._id) return;
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const userID = user._id;
+      const res = await api.get(`/api/items/all-items`, {
+        params: { userID: userID },
+      });
+      setProducts(res.data || []);
+    } catch (error) {
+      setLoadError(error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchItemsDetail = async () => {
-      try {
-        // Check if user and user._id are defined
-        if (!user || !user._id) {
-          console.error("User is not defined or invalid");
-          return;
-        }
-
-        const userID = user._id;
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/items/all-items`,
-          {
-            params: { userID: userID },
-          }
-        );
-        // console.log("Fetched data:", res.data);
-        if (res.data) {
-          setProducts(res.data);
-        } else {
-          console.error("Fetched data is not valid:", res.data);
-          setProducts([]);
-        }
-      } catch (error) {
-        console.log("Error fetching data:", error);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchItemsDetail();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const handleEditClick = (product) => {
@@ -119,41 +108,40 @@ const ProductsPage = ({ user }) => {
 
   if (!user || !user._id) {
     return (
-      <div className="container mx-auto px-4 py-6">
-        <p className="text-center text-gray-500">
-          User not found. Please log in.
-        </p>
+      <div className="flex flex-col items-center gap-1 py-16 text-center">
+        <PackageSearch size={22} className="mb-1 text-muted-foreground" />
+        <p className="text-sm font-medium">User not found</p>
+        <p className="text-xs text-muted-foreground">Please log in to view your inventory.</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 md:px-8">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-6 shadow-md">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="bg-white p-3 rounded-xl shadow-sm">
-              <ShoppingBag className="w-7 h-7 text-blue-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Product Inventory
-            </h1>
-          </div>
+      <Card className="flex items-center gap-3 p-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+          <ShoppingBag size={19} />
         </div>
-      </div>
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight">Product inventory</h1>
+          <p className="text-xs text-muted-foreground">
+            {products.length} product{products.length === 1 ? "" : "s"} tracked
+          </p>
+        </div>
+      </Card>
 
       {/* Filters and Search Section */}
-      <div className="rounded-2xl pr-2 pt-6 ">
+      <div>
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-          <div className="flex-grow w-full md:w-auto">
+          <div className="relative flex-grow w-full md:w-auto">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-              icon={<FaSearch className="text-gray-400" />}
+              className="w-full pl-9"
             />
           </div>
 
@@ -193,80 +181,64 @@ const ProductsPage = ({ user }) => {
       </div>
 
       {/* Products Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {loadError ? (
+        <Card>
+          <ErrorState error={loadError} onRetry={fetchItemsDetail} />
+        </Card>
+      ) : (
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,220px))] justify-start gap-4">
         {loading ? (
-          <div className="col-span-full flex justify-center items-center py-12">
-            <div className="animate-spin">
-              <FaBoxOpen className="w-12 h-12 text-blue-500" />
-            </div>
+          <div className="col-span-full flex items-center justify-center py-16">
+            <LoaderCircle className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <Card
               key={product._id}
-              className="relative group overflow-hidden transition-all duration-300 
-                         hover:shadow-xl hover:scale-[1.02] 
-                         border-2 border-transparent 
-                         hover:border-blue-200 
-                         bg-white rounded-2xl"
+              className="group relative overflow-hidden p-4 transition-shadow hover:shadow-md"
             >
-              <div className="absolute top-3 right-3 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  className="text-gray-500 hover:text-blue-600 transition-colors"
-                  onClick={() => handleEditClick(product)}
-                >
-                  <FaEdit className="w-5 h-5" />
-                </button>
+              <button
+                className="absolute right-3 top-3 text-muted-foreground opacity-0 transition-opacity hover:text-primary group-hover:opacity-100"
+                onClick={() => handleEditClick(product)}
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+
+              <h3 className="mb-3 truncate pr-6 text-base font-semibold">{product.name}</h3>
+
+              <div className="mb-3 grid grid-cols-2 gap-2">
+                <div className="rounded-md bg-accent p-2.5">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Stock</p>
+                  <p className={`font-mono text-sm font-semibold ${product.totalUnits > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive"}`}>
+                    {product.totalUnits > 0 ? product.totalUnits : "Out of stock"}
+                  </p>
+                </div>
+                <div className="rounded-md bg-accent p-2.5">
+                  <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">Price</p>
+                  <p className="font-mono text-sm font-semibold">₹{product.unitCost.toFixed(2)}</p>
+                </div>
               </div>
-
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xl font-bold text-gray-800 truncate">
-                  {product.name}
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-blue-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">
-                      Stock
-                    </p>
-                    <p
-                      className={`font-semibold ${product.totalUnits > 0 ? "text-green-600" : "text-red-500"}`}
-                    >
-                      {product.totalUnits > 0
-                        ? product.totalUnits
-                        : "Out of Stock"}
-                    </p>
-                  </div>
-                  <div className="bg-green-50 p-3 rounded-lg">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">
-                      Price
-                    </p>
-                    <p className="font-semibold text-green-700">
-                      ₹{product.unitCost.toFixed(2)}
-                    </p>
-                  </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <p className="text-muted-foreground">GST</p>
+                  <p className="font-mono font-medium">{product.gstPer ?? "N/A"}{product.gstPer != null ? "%" : ""}</p>
                 </div>
-                <div className="ml-2 grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <p className="text-gray-500">GST</p>
-                    <p className="font-medium">{product.gstPer || "N/A"}%</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">Units Sold</p>
-                    <p className="font-medium">{product.unitsSolds || 0}</p>
-                  </div>
+                <div>
+                  <p className="text-muted-foreground">Units sold</p>
+                  <p className="font-mono font-medium">{product.unitsSolds || 0}</p>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           ))
         ) : (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-500 text-lg">No products found.</p>
+          <div className="col-span-full flex flex-col items-center gap-1 py-16 text-center">
+            <ShoppingBag size={22} className="mb-1 text-muted-foreground" />
+            <p className="text-sm font-medium">No products found</p>
+            <p className="text-xs text-muted-foreground">Products you purchase will appear here.</p>
           </div>
         )}
       </div>
+      )}
       {isDrawerOpen && (
         <EditProductPopup
           user={user}

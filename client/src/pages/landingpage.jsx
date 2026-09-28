@@ -1,11 +1,18 @@
 "use client";
-import GSTIN from "../assets/gstin.jpg";
 import GST from "../assets/gstTreat.svg";
+import logoMark from "../assets/simply.svg";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import hello from "../assets/helloworld.jpg";
-import gear from "../assets/blueStrip.png";
-import hear from "../assets/dots.png"
+import {
+  Package,
+  Handshake,
+  ShoppingCart,
+  BarChart3,
+  Building2,
+  Smartphone,
+  Menu,
+  X,
+} from "lucide-react";
 // Components to Render
 function ComponentOne() {
   return (
@@ -25,7 +32,7 @@ function ComponentOne() {
         transition={{ type: "spring", damping: 20, stiffness: 100, delay: 0.2 }}
         className="w-full md:w-2/5 text-center md:text-left"
       >
-        <h3 className="text-3xl font-bold text-cyan-400 mb-4">
+        <h3 className="text-3xl font-bold text-teal-400 mb-4">
           Save GSTINs
         </h3>
         <p className="text-lg text-gray-300 leading-relaxed">
@@ -36,7 +43,7 @@ function ComponentOne() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-4 px-6 py-2 bg-cyan-600 text-white font-medium rounded-lg hover:bg-cyan-500 transition-all"
+          className="mt-4 px-6 py-2 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-500 transition-all"
         >
           Learn More
         </motion.button>
@@ -54,9 +61,9 @@ function ComponentTwo() {
         transition={{ type: "spring", damping: 20, stiffness: 100 }}
         className="w-full md:w-3/5 flex items-center justify-center"
       > 
-        <div className="w-4/5 max-w-md h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center border border-cyan-800 shadow-lg shadow-cyan-900/20">
+        <div className="w-4/5 max-w-md h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center border border-teal-800 shadow-lg shadow-teal-900/20">
           <div className="text-center p-6">
-            <span className="text-2xl font-bold text-cyan-300 block mb-3">HSN/SAC Codes</span>
+            <span className="text-2xl font-bold text-teal-300 block mb-3">HSN/SAC Codes</span>
             <p className="text-gray-300">Quickly search and apply the right codes to your products</p>
           </div>
         </div>
@@ -68,7 +75,7 @@ function ComponentTwo() {
         transition={{ type: "spring", damping: 20, stiffness: 100, delay: 0.2 }}
         className="w-full md:w-2/5 text-center md:text-left"
       >
-        <h3 className="text-3xl font-bold text-cyan-400 mb-4">
+        <h3 className="text-3xl font-bold text-teal-400 mb-4">
           HSN/SAC Codes
         </h3>
         <p className="text-lg text-gray-300 leading-relaxed">
@@ -78,7 +85,7 @@ function ComponentTwo() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-4 px-6 py-2 bg-cyan-600 text-white font-medium rounded-lg hover:bg-cyan-500 transition-all"
+          className="mt-4 px-6 py-2 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-500 transition-all"
         >
           View Codes
         </motion.button>
@@ -96,9 +103,9 @@ function ComponentThree() {
         transition={{ type: "spring", damping: 20, stiffness: 100 }}
         className="w-full md:w-3/5 flex items-center justify-center"
       > 
-        <div className="w-4/5 max-w-md h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center border border-blue-800 shadow-lg shadow-blue-900/20">
+        <div className="w-4/5 max-w-md h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center border border-teal-800 shadow-lg shadow-teal-900/20">
           <div className="text-center p-6">
-            <span className="text-2xl font-bold text-blue-300 block mb-3">Invoice Generator</span>
+            <span className="text-2xl font-bold text-teal-300 block mb-3">Invoice Generator</span>
             <p className="text-gray-300">Professional, compliant invoices in seconds</p>
           </div>
         </div>
@@ -110,7 +117,7 @@ function ComponentThree() {
         transition={{ type: "spring", damping: 20, stiffness: 100, delay: 0.2 }}
         className="w-full md:w-2/5 text-center md:text-left"
       >
-        <h3 className="text-3xl font-bold text-blue-400 mb-4">
+        <h3 className="text-3xl font-bold text-teal-400 mb-4">
           GST Invoices
         </h3>
         <p className="text-lg text-gray-300 leading-relaxed">
@@ -120,7 +127,7 @@ function ComponentThree() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-4 px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-500 transition-all"
+          className="mt-4 px-6 py-2 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-500 transition-all"
         >
           Create Invoice
         </motion.button>
@@ -138,9 +145,9 @@ function ComponentFour() {
         transition={{ type: "spring", damping: 20, stiffness: 100 }}
         className="w-full md:w-3/5 flex items-center justify-center"
       > 
-        <div className="w-4/5 max-w-md h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center border border-cyan-800 shadow-lg shadow-cyan-900/20">
+        <div className="w-4/5 max-w-md h-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center border border-teal-800 shadow-lg shadow-teal-900/20">
           <div className="text-center p-6">
-            <span className="text-2xl font-bold text-cyan-300 block mb-3">Tax Calculator</span>
+            <span className="text-2xl font-bold text-teal-300 block mb-3">Tax Calculator</span>
             <p className="text-gray-300">Automatic calculations based on item category and location</p>
           </div>
         </div>
@@ -152,7 +159,7 @@ function ComponentFour() {
         transition={{ type: "spring", damping: 20, stiffness: 100, delay: 0.2 }}
         className="w-full md:w-2/5 text-center md:text-left"
       >
-        <h3 className="text-3xl font-bold text-cyan-400 mb-4">
+        <h3 className="text-3xl font-bold text-teal-400 mb-4">
           Tax Management
         </h3>
         <p className="text-lg text-gray-300 leading-relaxed">
@@ -162,7 +169,7 @@ function ComponentFour() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-4 px-6 py-2 bg-cyan-600 text-white font-medium rounded-lg hover:bg-cyan-500 transition-all"
+          className="mt-4 px-6 py-2 bg-teal-600 text-white font-medium rounded-lg hover:bg-teal-500 transition-all"
         >
           Calculate Taxes
         </motion.button>
@@ -184,66 +191,27 @@ function FirstView() {
   }, []);
 
   return (
-    <section className="h-200 flex items-center justify-center py-16 relative bg-gradient-to-b from-black to-gray-900">
-      {/* Background image with reduced opacity */}
-      <div 
-        className="absolute inset-0 bg-gradient-to-b from-black to-gray-900 z-0"
-          style={{
-            backgroundImage: `url(${gear})`,
-            height: '50%',
-            backgroundSize: 3000,
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            opacity: 0.1, 
-            backdropFilter: 'blur(500px)',
-            backgroundOrigin: 'border-box',
-          }}
-      ></div>
-      
-      <div className="w-5/5 max-w-7xl mx-auto bg-black bg-opacity-80 rounded-xl p-8 z-10 relative
-    border-2 border-cyan-500
-    shadow-[0_0_20px_rgba(6,182,212,0.5),0_0_40px_rgba(6,182,212,0.3)]
-    backdrop-filter backdrop-blur-md">
+    <section className="flex items-center justify-center py-20 relative bg-gradient-to-b from-black to-gray-900">
+      <div className="w-full max-w-7xl mx-auto bg-black/60 rounded-xl p-8 z-10 relative
+    border border-teal-900
+    shadow-2xl
+    backdrop-blur-md">
         <div className="w-full flex flex-col items-center">
           <motion.h2
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl font-bold text-cyan-400 text-center mb-12"
+            className="text-4xl font-bold text-teal-400 text-center mb-12"
           >
             What makes Managio Inventory GST Compliant
           </motion.h2>
           
           {/* Tab Navigation */}
           <div className="flex flex-wrap w-full mb-10 gap-2">
-            <TabButton
-              label="GSTIN"
-              onClick={() => handleTask(<ComponentOne />)}
-              bgColor="bg-gray-800"
-              hoverColor="bg-cyan-900"
-              accentColor="bg-cyan-500"
-            />
-            <TabButton
-              label="HSN/SAC CODES"
-              onClick={() => handleTask(<ComponentTwo />)}
-              bgColor="bg-gray-800"
-              hoverColor="bg-cyan-900"
-              accentColor="bg-cyan-500"
-            />
-            <TabButton
-              label="INVOICES"
-              onClick={() => handleTask(<ComponentThree />)}
-              bgColor="bg-gray-800"
-              hoverColor="bg-blue-900"
-              accentColor="bg-blue-500"
-            />
-            <TabButton
-              label="TAXES"
-              onClick={() => handleTask(<ComponentFour />)}
-              bgColor="bg-gray-800"
-              hoverColor="bg-cyan-900"
-              accentColor="bg-cyan-500"
-            />
+            <TabButton label="GSTIN" onClick={() => handleTask(<ComponentOne />)} />
+            <TabButton label="HSN/SAC CODES" onClick={() => handleTask(<ComponentTwo />)} />
+            <TabButton label="INVOICES" onClick={() => handleTask(<ComponentThree />)} />
+            <TabButton label="TAXES" onClick={() => handleTask(<ComponentFour />)} />
           </div>
           
           {/* Rendered Component Below */}
@@ -257,17 +225,17 @@ function FirstView() {
 }
 
 // Tab Button Component
-function TabButton({ label, onClick, bgColor, hoverColor, accentColor }) {
+function TabButton({ label, onClick }) {
   return (
     <motion.button
       onClick={onClick}
       whileHover={{ scale: 1.03 }}
       whileTap={{ scale: 0.97 }}
-      className={`flex-1 min-w-[150px] py-4 px-2 m-1 rounded-lg text-gray-300 font-bold transition-all ${bgColor} hover:${hoverColor} hover:text-white relative overflow-hidden
-        after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:${accentColor}
-        after:scale-x-0 after:origin-center 
-        after:transition-transform after:duration-300 after:ease-in-out 
-        hover:after:scale-x-100 shadow-md`}
+      className="flex-1 min-w-[150px] py-4 px-2 m-1 rounded-lg text-gray-300 font-bold transition-all bg-gray-800 hover:bg-teal-900 hover:text-white relative overflow-hidden
+        after:absolute after:bottom-0 after:left-0 after:w-full after:h-1 after:bg-teal-500
+        after:scale-x-0 after:origin-center
+        after:transition-transform after:duration-300 after:ease-in-out
+        hover:after:scale-x-100 shadow-md"
     >
       {label}
     </motion.button>
@@ -277,7 +245,7 @@ function TabButton({ label, onClick, bgColor, hoverColor, accentColor }) {
 // Second View
 function SecondView() {
   return (
-    <section id="features" className="min-h-screen flex items-center justify-center py-16 bg-gradient-to-br from-gray-900 via-gray-900 to-cyan-900 "
+    <section id="features" className="min-h-screen flex items-center justify-center py-16 bg-gradient-to-br from-gray-900 via-gray-900 to-teal-900 "
   
     >
       <div className="w-4/5 max-w-7xl mx-auto rounded-lg p-8">
@@ -287,46 +255,40 @@ function SecondView() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="w-full p-6 bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl shadow-lg mb-12 border-b border-cyan-800"
+            className="w-full p-6 bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl shadow-lg mb-12 border-b border-teal-800"
           >
-            <h2 className="text-3xl font-bold text-cyan-400 text-center">Explore the Features</h2>
+            <h2 className="text-3xl font-bold text-teal-400 text-center">Explore the Features</h2>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
-            <FeatureCard 
-              title="Stock Management" 
-              icon="📦" 
-              color="border-cyan-700" 
+            <FeatureCard
+              title="Stock Management"
+              icon={Package}
               description="Real-time inventory tracking and management"
             />
-            <FeatureCard 
-              title="Supplier Management" 
-              icon="🤝" 
-              color="border-blue-700" 
+            <FeatureCard
+              title="Supplier Management"
+              icon={Handshake}
               description="Track all your supplier relationships in one place"
             />
-            <FeatureCard 
-              title="Order Processing" 
-              icon="🛒" 
-              color="border-cyan-700" 
+            <FeatureCard
+              title="Order Processing"
+              icon={ShoppingCart}
               description="Streamline your order fulfillment workflow"
             />
-            <FeatureCard 
-              title="Reporting" 
-              icon="📊" 
-              color="border-blue-700" 
+            <FeatureCard
+              title="Reporting"
+              icon={BarChart3}
               description="Detailed insights and analytics for better decisions"
             />
-            <FeatureCard 
-              title="Multi-location" 
-              icon="🏢" 
-              color="border-cyan-700" 
+            <FeatureCard
+              title="Multi-location"
+              icon={Building2}
               description="Manage inventory across multiple warehouses"
             />
-            <FeatureCard 
-              title="Mobile Access" 
-              icon="📱" 
-              color="border-blue-700" 
+            <FeatureCard
+              title="Mobile Access"
+              icon={Smartphone}
               description="Access your inventory system from anywhere"
             />
           </div>
@@ -337,59 +299,22 @@ function SecondView() {
 }
 
 // Feature Card Component
-function FeatureCard({ title, icon, color, description }) {
+function FeatureCard({ title, icon: Icon, description }) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ y: 50, opacity: 0 }}
       whileInView={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      whileHover={{ y: -5, scale: 1.02 }}
-      className={`bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex flex-col items-center justify-center p-8 transition-all cursor-pointer border-t ${color} shadow-lg hover:shadow-xl`}
+      whileHover={{ y: -4 }}
+      className="bg-gray-900 rounded-xl flex flex-col items-center justify-center p-8 transition-shadow cursor-default border-t border-teal-800 shadow-lg hover:shadow-xl"
     >
-      <span className="text-5xl mb-4">{icon}</span>
-      <span className="text-xl font-bold text-gray-200 mb-2">{title}</span>
-      <p className="text-gray-400 text-center">{description}</p>
-    </motion.div>
-  );
-}
-
-// Third View
-function ThirdView() {
-  return (
-    <section className="min-h-screen flex items-center justify-center py-16 bg-gradient-to-r from-cyan-900 via-blue-950 to-cyan-900">
-      <div className="w-4/5 max-w-6xl mx-auto bg-black bg-opacity-70 rounded-xl shadow-2xl p-8 border border-cyan-800">
-        <div className="text-center">
-          <motion.h2 
-            initial={{ opacity: 0, y: -20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-3xl font-bold text-cyan-400 mb-8"
-          >
-            Powerful Inventory Management
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="text-xl text-gray-300 mb-8"
-          >
-            Track stock levels, manage suppliers, and optimize your inventory with ease.
-          </motion.p>
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="w-full h-64 bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl flex items-center justify-center border border-cyan-900 shadow-lg shadow-cyan-900/20"
-          >
-            <span className="text-2xl font-bold text-cyan-300">Inventory Dashboard</span>
-          </motion.div>
-        </div>
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-teal-500/10">
+        <Icon size={22} className="text-teal-400" />
       </div>
-    </section>
+      <span className="text-lg font-semibold text-gray-100 mb-1.5">{title}</span>
+      <p className="text-sm text-gray-400 text-center">{description}</p>
+    </motion.div>
   );
 }
 
@@ -428,33 +353,31 @@ const Navbar = ({ user }) => {
         opacity: visible ? 1 : 0
       }}
       transition={{ duration: 0.3 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-gray-900 bg-opacity-95 backdrop-blur-md border-b border-cyan-900 shadow-lg"
+      className="fixed top-0 left-0 right-0 z-50 bg-gray-900 bg-opacity-95 backdrop-blur-md border-b border-teal-900 shadow-lg"
     >
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
-          <a href="#" className="text-2xl font-bold text-cyan-400 flex items-center">
-            <span className="text-xl mr-2">📦</span>
+          <a href="#" className="text-lg font-semibold text-white flex items-center gap-2">
+            <img src={logoMark} alt="" className="h-6 w-6" />
             Managio
           </a>
-          
+
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <button 
+            <button
               onClick={toggleMenu}
-              className="text-gray-200 hover:text-cyan-400 focus:outline-none"
+              className="text-gray-200 hover:text-teal-400 focus:outline-none"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
           
           {/* Desktop menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Home</a>
-            <a href="#features" className="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Features</a>
-            <a href="#pricing" className="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Pricing</a>
-            <a href="#contact" className="text-gray-300 hover:text-cyan-400 font-medium transition-colors">Contact</a>
+            <a href="#" className="text-gray-300 hover:text-teal-400 font-medium transition-colors">Home</a>
+            <a href="#features" className="text-gray-300 hover:text-teal-400 font-medium transition-colors">Features</a>
+            <a href="#pricing" className="text-gray-300 hover:text-teal-400 font-medium transition-colors">Pricing</a>
+            <a href="#contact" className="text-gray-300 hover:text-teal-400 font-medium transition-colors">Contact</a>
           </div>
           
           <div className="hidden md:flex items-center">
@@ -466,7 +389,7 @@ const Navbar = ({ user }) => {
                 <div className="relative group">
                   <motion.div 
                     whileHover={{ scale: 1.05 }}
-                    className="h-10 w-10 rounded-full overflow-hidden border-2 border-cyan-500 cursor-pointer shadow-md"
+                    className="h-10 w-10 rounded-full overflow-hidden border-2 border-teal-500 cursor-pointer shadow-md"
                   >
                     {user.profileImg ? (
                       <img 
@@ -475,15 +398,15 @@ const Navbar = ({ user }) => {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-cyan-700 to-cyan-600 flex items-center justify-center text-white font-bold text-lg">
+                      <div className="h-full w-full bg-gradient-to-br from-teal-700 to-teal-600 flex items-center justify-center text-white font-bold text-lg">
                         {(user.name?.charAt(0) || 'U').toUpperCase()}
                       </div>
                     )}
                   </motion.div>
                   <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 border border-gray-700">
-                    <a href="/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-cyan-400 transition-colors">Profile</a>
-                    <a href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-cyan-400 transition-colors">Settings</a>
-                    <a href="/logout" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-cyan-400 transition-colors">Logout</a>
+                    <a href="/profile" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-teal-400 transition-colors">Profile</a>
+                    <a href="/settings" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-teal-400 transition-colors">Settings</a>
+                    <a href="/logout" className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-teal-400 transition-colors">Logout</a>
                   </div>
                 </div>
               </div>
@@ -492,7 +415,7 @@ const Navbar = ({ user }) => {
                 onClick={() => window.location.href = "/login"} 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-gradient-to-r from-cyan-700 to-cyan-600 rounded-lg text-gray-100 font-medium hover:from-cyan-600 hover:to-cyan-500 transition-all shadow-md"
+                className="px-4 py-2 bg-gradient-to-r from-teal-700 to-teal-600 rounded-lg text-gray-100 font-medium hover:from-teal-600 hover:to-teal-500 transition-all shadow-md"
               >
                 Login/Sign Up
               </motion.button>
@@ -525,7 +448,7 @@ const Navbar = ({ user }) => {
             {user ? (
               <div className="pt-4 pb-3 border-t border-gray-700">
                 <div className="flex items-center px-3">
-                  <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden border-2 border-cyan-500 shadow-md">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full overflow-hidden border-2 border-teal-500 shadow-md">
                     {user.profileImg ? (
                       <img 
                         src={user.profileImg} 
@@ -533,7 +456,7 @@ const Navbar = ({ user }) => {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-cyan-700 to-cyan-600 flex items-center justify-center text-white font-bold text-lg">
+                      <div className="h-full w-full bg-gradient-to-br from-teal-700 to-teal-600 flex items-center justify-center text-white font-bold text-lg">
                         {(user.name?.charAt(0) || 'U').toUpperCase()}
                       </div>
                     )}
@@ -560,7 +483,7 @@ const Navbar = ({ user }) => {
                 <div className="flex justify-center">
                   <button 
                     onClick={() => window.location.href = "/login"} 
-                    className="w-full mx-3 px-4 py-2 bg-gradient-to-r from-cyan-700 to-cyan-600 rounded-lg text-gray-100 font-medium hover:from-cyan-600 hover:to-cyan-500 transition-all shadow-md"
+                    className="w-full mx-3 px-4 py-2 bg-gradient-to-r from-teal-700 to-teal-600 rounded-lg text-gray-100 font-medium hover:from-teal-600 hover:to-teal-500 transition-all shadow-md"
                   >
                     Login/Sign Up
                   </button>
@@ -585,8 +508,8 @@ export default function InventoryManagement({user}) {
       <div className="h-screen flex flex-col items-center justify-center px-4 bg-gradient-to-br from-black via-gray-900 to-black relative overflow-hidden">
         {/* Background elements */}
         <div className="absolute inset-0 overflow-hidden opacity-20">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-cyan-700 filter blur-3xl"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-64 h-64 rounded-full bg-blue-700 filter blur-3xl"></div>
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-teal-700 filter blur-3xl"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-64 h-64 rounded-full bg-teal-700 filter blur-3xl"></div>
         </div>
         
         <motion.div
@@ -598,7 +521,7 @@ export default function InventoryManagement({user}) {
           <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-50 drop-shadow-lg">
             Inventory Management Software
           </h1>
-          <h2 className="text-2xl md:text-4xl font-bold text-cyan-100 mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold text-teal-100 mb-4">
             Designed for Indian Businesses
           </h2>
           <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
@@ -614,7 +537,7 @@ export default function InventoryManagement({user}) {
               onClick={() => window.location.href = "/login"}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-gradient-to-r from-cyan-700 to-cyan-600 rounded-lg text-lg font-bold hover:from-cyan-600 hover:to-cyan-500 transition-all shadow-lg"
+              className="px-6 py-3 bg-gradient-to-r from-teal-700 to-teal-600 rounded-lg text-lg font-bold hover:from-teal-600 hover:to-teal-500 transition-all shadow-lg"
             >
               Access to Managio
             </motion.a>
@@ -622,7 +545,7 @@ export default function InventoryManagement({user}) {
               href="#contact" 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-6 py-3 bg-gray-800 rounded-lg text-lg font-bold border border-cyan-800 hover:bg-gray-700 transition-all shadow-lg"
+              className="px-6 py-3 bg-gray-800 rounded-lg text-lg font-bold border border-teal-800 hover:bg-gray-700 transition-all shadow-lg"
             >
               Contact Us
             </motion.a>
@@ -631,12 +554,9 @@ export default function InventoryManagement({user}) {
       </div>
       
       {/* Parallax Views Container */}
-      <div id="" className="flex flex-col">
+      <div className="flex flex-col">
         <FirstView />
         <SecondView />
-        {/* <ThirdView /> */}
-        {/* <FourthView /> */}
-        {/* <FifthView /> */}
       </div>
       
       {/* Footer */}
@@ -644,7 +564,7 @@ export default function InventoryManagement({user}) {
         <div className="container mx-auto text-center text-gray-400">
           <div className="w-4/5 max-w-6xl mx-auto bg-black bg-opacity-80 rounded-lg p-8">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-cyan-400 mb-8">Get Started Today</h2>
+              <h2 className="text-3xl font-bold text-teal-400 mb-8">Get Started Today</h2>
               <p className="text-xl text-gray-300 mb-10">
                 Join thousands of Indian businesses already using Managio Inventory.
               </p>
@@ -653,14 +573,14 @@ export default function InventoryManagement({user}) {
                   onClick={() => window.location.href = "/login"}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-cyan-600 text-white font-bold text-xl rounded-lg hover:bg-cyan-500 transition-colors"
+                  className="px-8 py-4 bg-teal-600 text-white font-bold text-xl rounded-lg hover:bg-teal-500 transition-colors"
                 >
                   Start Free Trial
                 </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-gray-800 text-cyan-300 font-bold text-xl rounded-lg hover:bg-gray-700 transition-colors border border-cyan-700"
+                  className="px-8 py-4 bg-gray-800 text-teal-300 font-bold text-xl rounded-lg hover:bg-gray-700 transition-colors border border-teal-700"
                 >
                   Watch Demo
                 </motion.button>

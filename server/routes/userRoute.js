@@ -1,13 +1,11 @@
 import express from "express";
 import { User } from "../models/user.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
+router.use(verifyFirebaseToken);
 
-router.get("/", async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
-
+router.get("/user", async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: "User not found" });

@@ -1,15 +1,17 @@
 import express from "express";
-import mongoose from "mongoose";
 
 import { Item } from "../models/items.js";
 import { Purchase } from "../models/purchase.js";
 import { Sales } from "../models/sales.js";
 import { Warehouse } from "../models/warehouse.js";
+import { verifyFirebaseToken } from "../middleware/authMiddleware.js";
+import { getIO } from "../socket.js";
 
 const router = express.Router();
+router.use(verifyFirebaseToken);
 
 router.get("/top-bought", async (req, res) => {
-  const { fromDate, toDate, userID } = req.query;
+  const { fromDate, toDate } = req.query;
 
   const startDate = fromDate ? new Date(fromDate) : new Date("1988-01-01");
   const endDate = toDate ? new Date(toDate) : new Date();
@@ -18,7 +20,7 @@ router.get("/top-bought", async (req, res) => {
     const topBoughtItems = await Purchase.aggregate([
       {
         $match: {
-          userID: new mongoose.Types.ObjectId(userID),
+          userID: req.user._id,
         },
       },
       { $unwind: "$purchaseDetails" },
@@ -53,7 +55,7 @@ router.get("/top-bought", async (req, res) => {
 
 router.get("/top-sold", async (req, res) => {
   try {
-    const { fromDate, toDate, userID } = req.query;
+    const { fromDate, toDate } = req.query;
 
     const startDate = fromDate ? new Date(fromDate) : new Date("1996-01-01");
     const endDate = toDate ? new Date(toDate) : new Date();
@@ -61,7 +63,7 @@ router.get("/top-sold", async (req, res) => {
     const topSoldItems = await Sales.aggregate([
       {
         $match: {
-          userID: new mongoose.Types.ObjectId(userID),
+          userID: req.user._id,
         },
       },
       { $unwind: "$salesDetails" },
@@ -96,11 +98,9 @@ router.get("/top-sold", async (req, res) => {
 
 router.get("/all-items", async (req, res) => {
   try {
-    const { userID } = req.query;
-    let existingItems = await Item.findOne({ userID: userID });
-    existingItems = existingItems.itemDetails;
+    const existingItems = await Item.findOne({ userID: req.user._id });
 
-    res.status(200).json(existingItems);
+    res.status(200).json(existingItems?.itemDetails || []);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Server error" });
@@ -109,19 +109,18 @@ router.get("/all-items", async (req, res) => {
 
 router.put("/update-item", async (req, res) => {
   try {
-    const { userID, warehouseID, items } = req.body;
-    console.log(req.body);  
+    const { warehouseID, items } = req.body;
 
     /* updating the warehouse entry first */
     const warehouseDoc = await Warehouse.findOne({
-      userID: userID,
+      userID: req.user._id,
       "warehouseDetails._id": warehouseID,
     });
     const existingWarehouse = warehouseDoc.warehouseDetails.find(
       (warehouse) => warehouse._id.toString() === warehouseID
     );
 
-    const itemDoc = await Item.findOne({ userID: userID });
+    const itemDoc = await Item.findOne({ userID: req.user._id });
     const existingItems = itemDoc.itemDetails;
 
     let existingItem = existingWarehouse.items.find(
@@ -146,6 +145,7 @@ router.put("/update-item", async (req, res) => {
     await warehouseDoc.save();
     await itemDoc.save();
 
+    getIO().to(String(req.user._id)).emit("dashboard:refresh");
     res.status(200).json({
       message: "received!",
     });
