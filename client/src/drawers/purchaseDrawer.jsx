@@ -242,37 +242,6 @@ export default function PurchaseDrawer({ user, fetchUser }) {
     });
   };
 
-<<<<<<< HEAD
-=======
-  const fetchHSNDetails = async (itemCode, index) => {
-    if (!itemCode) return;
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/hsn/hsnAdd/${itemCode}`
-      );
-      // const rponce = await fetch(`{import.meta.env.VITE_API_URL}/newCustomer/customer-list`,{name:name} );
-      // const customerData = await response.json(),
-
-      if (!response.ok) throw new Error("Item not found");
-
-      const data = await response.json();
-      setPurchaseOrder((prev) => {
-        const updatedItems = [...prev.items];
-        updatedItems[index] = {
-          ...updatedItems[index],
-          itemCode: data.item_code || "",
-          hsnCode: data.hsn_code || "",
-          gstPer: data.gst_per || 0,
-          itemName: data.item_name || "Unknown",
-        };
-        return { ...prev, items: updatedItems };
-      });
-    } catch (error) {
-      console.error("Error fetching item details:", error);
-    }
-  };
-
->>>>>>> upstream/improved-version
   const addNewItem = () => {
     setPurchaseOrder((prev) => ({
       ...prev,

@@ -24,30 +24,12 @@ function App() {
             </div>
         );
     }
-  };
 
-  useEffect(() => {
-    fetchUser();
-    const delayTimer = setTimeout(() => {
-      setDelayComplete(true);
-    }, 2000);
-
-    return () => clearTimeout(delayTimer);
-  }, []);
-
-  if (loading || !delayComplete) {
     return (
         <Router>
             <AppRoutes user={user} fetchUser={refreshUser} />
         </Router>
     );
-  }
-
-  return (
-    <Router>
-      <AppRoutes user={user} fetchUser={fetchUser} />
-    </Router>
-  );
 }
 
 export default App;
